@@ -1,0 +1,104 @@
+/* ===== 微光 · 语音陪伴对话页，body 规则收敛到 .voice-shell ===== */
+.voice-shell {
+  --text-dim: rgba(255, 255, 255, 0.66);
+  --text-faint: rgba(255, 255, 255, 0.52);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.voice-page-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.voice-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 55% 45% at 50% 42%, var(--light-faint), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.8s var(--ease);
+}
+.voice-shell[data-state="listening"]::before { opacity: 1.4; }
+.voice-shell[data-state="speaking"]::before  { opacity: 1.6; }
+.voice-shell[data-state="thinking"]::before  { opacity: 0.7; }
+
+.voice-shell .vnav { position: relative; z-index: 5; display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 1.6rem; }
+.voice-shell .vnav__back { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text-mid); text-decoration: none; font-size: 0.86rem; letter-spacing: 0.1em; transition: color 0.4s var(--ease); }
+.voice-shell .vnav__back:hover { color: var(--text); }
+.voice-shell .vnav__arrow { font-size: 1rem; }
+.voice-shell .vnav__brand { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--serif); letter-spacing: 0.25em; font-size: 1rem; }
+.voice-shell .vnav__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--light); box-shadow: 0 0 10px var(--light-glow); animation: breathe 4s ease-in-out infinite; }
+.voice-shell .vnav__tag { font-family: var(--sans); font-size: 0.62rem; letter-spacing: 0.2em; color: var(--text-dim); border: 1px solid var(--line-strong); border-radius: 999px; padding: 0.15rem 0.5rem; margin-left: 0.3rem; }
+.voice-shell .vnav__spacer { width: 60px; }
+
+.voice-shell .stage { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 1rem 1.5rem 2rem; gap: 1.6rem; }
+
+.voice-shell .orb-stage { position: relative; width: 320px; height: 320px; display: flex; align-items: center; justify-content: center; }
+.voice-shell .orb { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; }
+.voice-shell .orb-halo { position: absolute; top: 50%; left: 50%; width: 260px; height: 260px; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, var(--light-faint) 0%, transparent 62%); z-index: 1; transition: width 0.8s var(--ease), height 0.8s var(--ease), opacity 0.8s var(--ease); }
+.voice-shell[data-state="listening"] .orb-halo { width: 320px; height: 320px; opacity: 1.3; }
+.voice-shell[data-state="speaking"]  .orb-halo { width: 340px; height: 340px; opacity: 1.5; animation: halo 1.6s ease-in-out infinite; }
+.voice-shell[data-state="thinking"]  .orb-halo { width: 220px; height: 220px; opacity: 0.6; }
+
+.voice-shell .orb-tap { position: absolute; inset: 0; z-index: 3; background: transparent; border: none; cursor: pointer; border-radius: 50%; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 1.2rem; }
+.voice-shell .orb-tap:focus-visible { outline: 2px solid var(--line-strong); outline-offset: 8px; }
+.voice-shell .orb-tap__hint { font-size: 0.82rem; letter-spacing: 0.25em; color: var(--text-dim); padding-left: 0.25em; transition: opacity 0.4s var(--ease); }
+.voice-shell:not([data-state="idle"]) .orb-tap__hint { opacity: 0; }
+
+.voice-shell .status { font-family: var(--serif); font-size: 1.1rem; letter-spacing: 0.15em; color: var(--text-mid); min-height: 1.6em; transition: color 0.5s var(--ease), opacity 0.5s var(--ease); }
+.voice-shell[data-state="listening"] .status { color: var(--light); opacity: 0.9; }
+.voice-shell[data-state="thinking"]  .status { color: var(--text-dim); }
+.voice-shell[data-state="speaking"]  .status { color: var(--text); }
+.voice-shell .status::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor; margin-right: 0.7rem; vertical-align: middle; opacity: 0; transform: translateY(-1px); }
+.voice-shell[data-state="listening"] .status::before,
+.voice-shell[data-state="thinking"]  .status::before,
+.voice-shell[data-state="speaking"]  .status::before { opacity: 0.8; animation: blink 1.4s ease-in-out infinite; }
+
+.transcript { width: 100%; max-width: 520px; min-height: 120px; display: flex; flex-direction: column; gap: 0.9rem; padding: 0 0.5rem; }
+.tline { font-family: var(--serif); line-height: 2; letter-spacing: 0.04em; opacity: 0; transform: translateY(12px); animation: lineIn 0.8s var(--ease) forwards; }
+.tline--user { align-self: flex-end; max-width: 80%; color: var(--text-dim); font-size: 0.98rem; }
+.tline--ai { align-self: flex-start; max-width: 88%; color: var(--text); font-size: 1.12rem; }
+.tline__who { display: inline-block; font-family: var(--sans); font-size: 0.66rem; letter-spacing: 0.2em; color: var(--text-faint); margin-right: 0.5rem; vertical-align: middle; }
+
+.footnote { margin-top: auto; padding-top: 1rem; font-size: 0.74rem; line-height: 1.8; color: var(--text-faint); letter-spacing: 0.04em; }
+
+.dock { position: relative; z-index: 5; display: flex; align-items: center; justify-content: center; padding: 1.2rem 1.5rem 2rem; }
+.dock-btn { width: 56px; height: 56px; border-radius: 50%; border: 1px solid var(--line-strong); background: rgba(255,255,255,0.03); color: var(--text-mid); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.4s var(--ease); }
+.dock-btn:hover { border-color: var(--text-mid); color: var(--text); background: rgba(255,255,255,0.06); }
+.dock-btn__icon { font-size: 1.1rem; }
+
+@keyframes breathe { 0%, 100% { opacity: 0.85; transform: scale(1); } 50% { opacity: 1; transform: scale(1.15); } }
+@keyframes halo { 0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1.3; transform: translate(-50%, -50%) scale(1.08); } }
+@keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.9; } }
+@keyframes lineIn { to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 760px) {
+  .voice-shell .orb-stage { width: 260px; height: 260px; }
+  .voice-shell .orb-halo { width: 210px; height: 210px; }
+  .voice-shell[data-state="listening"] .orb-halo { width: 260px; height: 260px; }
+  .voice-shell[data-state="speaking"]  .orb-halo { width: 280px; height: 280px; }
+  .voice-shell .status { font-size: 1rem; }
+  .voice-shell .vnav__brand { font-size: 0.9rem; }
+  .voice-shell .vnav__spacer { width: 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-shell *, .voice-shell *::before, .voice-shell *::after { animation-duration: 0.001ms !important; transition-duration: 0.2s !important; }
+}

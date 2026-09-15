@@ -1,0 +1,20 @@
+services:
+  voice-postgres:
+    image: postgres:16-alpine
+    container_name: weiguang-voice-postgres
+    environment:
+      POSTGRES_USER: weiguang
+      POSTGRES_DB: weiguang
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "127.0.0.1:55433:5432"
+    volumes:
+      - weiguang_voice_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U weiguang -d weiguang"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  weiguang_voice_postgres:

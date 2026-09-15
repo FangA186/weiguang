@@ -1,0 +1,501 @@
+/* pricing.css - 微光套餐页样式系统 */
+
+.pricing-view {
+  min-height: 100vh;
+  background-color: var(--color-bg, #0b0d10);
+  color: var(--color-text-main, #f0f2f5);
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", sans-serif);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Background subtle ambient glow */
+.pricing-view::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(235, 215, 175, 0.06) 0%, rgba(11, 13, 16, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Top Nav */
+.pricing-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: rgba(11, 13, 16, 0.82);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pricing-nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #f0f2f5;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.pricing-nav__brand .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ecd7af;
+  box-shadow: 0 0 10px rgba(236, 215, 175, 0.8);
+  animation: breathe 3s infinite ease-in-out;
+}
+
+.pricing-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pricing-nav__btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(240, 242, 245, 0.85);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.pricing-nav__btn:hover {
+  border-color: rgba(236, 215, 175, 0.4);
+  color: #ecd7af;
+  background: rgba(236, 215, 175, 0.05);
+}
+
+.pricing-nav__btn--primary {
+  background: #ecd7af;
+  color: #121417;
+  border-color: #ecd7af;
+  font-weight: 500;
+}
+
+.pricing-nav__btn--primary:hover {
+  background: #f5e3c2;
+  color: #0b0d10;
+}
+
+/* Main Container */
+.pricing-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Hero */
+.pricing-hero {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.pricing-hero__tag {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 12px;
+  background: rgba(236, 215, 175, 0.1);
+  border: 1px solid rgba(236, 215, 175, 0.25);
+  color: #ecd7af;
+  font-size: 12px;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.pricing-hero__title {
+  font-family: "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", serif;
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin: 0 0 16px;
+  color: #f7f8fa;
+}
+
+.pricing-hero__subtitle {
+  font-size: 15px;
+  color: rgba(240, 242, 245, 0.65);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Plan Cards Grid */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 72px;
+}
+
+.pricing-card {
+  background: rgba(20, 24, 30, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 32px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+
+.pricing-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.pricing-card--featured {
+  background: rgba(24, 29, 38, 0.85);
+  border: 1.5px solid rgba(236, 215, 175, 0.5);
+  box-shadow: 0 8px 32px rgba(236, 215, 175, 0.08);
+}
+
+.pricing-card--featured:hover {
+  border-color: rgba(236, 215, 175, 0.8);
+  box-shadow: 0 12px 40px rgba(236, 215, 175, 0.12);
+}
+
+.pricing-card__badge {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: #ecd7af;
+  color: #121417;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+}
+
+.pricing-card__header {
+  margin-bottom: 24px;
+}
+
+.pricing-card__name {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: #f7f8fa;
+}
+
+.pricing-card__desc {
+  font-size: 13px;
+  color: rgba(240, 242, 245, 0.55);
+  margin: 0;
+  min-height: 36px;
+  line-height: 1.4;
+}
+
+.pricing-card__price-box {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pricing-card__currency {
+  font-size: 18px;
+  font-weight: 500;
+  color: #ecd7af;
+}
+
+.pricing-card__amount {
+  font-size: 36px;
+  font-weight: 700;
+  color: #f7f8fa;
+  line-height: 1;
+}
+
+.pricing-card__unit {
+  font-size: 13px;
+  color: rgba(240, 242, 245, 0.5);
+  margin-left: 2px;
+}
+
+.pricing-card__features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pricing-card__feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(240, 242, 245, 0.8);
+  line-height: 1.4;
+}
+
+.pricing-card__feature-icon {
+  color: #ecd7af;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.pricing-card__btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.pricing-card__btn--active {
+  background: #ecd7af;
+  color: #121417;
+  border: 1px solid #ecd7af;
+}
+
+.pricing-card__btn--active:hover {
+  background: #f5e3c2;
+}
+
+.pricing-card__btn--disabled {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(240, 242, 245, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: not-allowed;
+}
+
+.pricing-card__btn--outline {
+  background: transparent;
+  color: rgba(240, 242, 245, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.pricing-card__btn--outline:hover {
+  border-color: rgba(236, 215, 175, 0.5);
+  color: #ecd7af;
+}
+
+.pricing-redeem {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  margin: -40px 0 64px;
+  padding: 22px 24px;
+  border: 1px solid rgba(236, 215, 175, 0.2);
+  border-radius: 14px;
+  background: rgba(236, 215, 175, 0.04);
+}
+
+.pricing-redeem__eyebrow { color: #ecd7af; font-size: 11px; letter-spacing: 0.08em; }
+.pricing-redeem h2 { margin: 4px 0 6px; color: #f7f8fa; font: 500 18px/1.4 "Songti SC", "Source Han Serif SC", serif; }
+.pricing-redeem p { margin: 0; color: rgba(240, 242, 245, 0.58); font-size: 12px; line-height: 1.6; }
+.pricing-redeem__toggle,
+.pricing-redeem__form button { min-height: 40px; padding: 0 18px; border: 1px solid #ecd7af; border-radius: 8px; background: #ecd7af; color: #121417; font: 500 13px/1 sans-serif; cursor: pointer; white-space: nowrap; }
+.pricing-redeem__form { min-width: min(380px, 100%); }
+.pricing-redeem__form label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.pricing-redeem__controls { display: flex; gap: 8px; }
+.pricing-redeem__controls input { min-width: 0; flex: 1; min-height: 40px; padding: 0 12px; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 8px; background: rgba(0, 0, 0, 0.22); color: #f7f8fa; outline: none; }
+.pricing-redeem__controls input:focus { border-color: rgba(236, 215, 175, 0.58); }
+.pricing-redeem__form button:disabled,
+.pricing-redeem__toggle:disabled { opacity: 0.45; cursor: default; }
+.pricing-redeem .pricing-redeem__message { margin-top: 8px; color: #ecd7af; }
+
+/* Comparison Table Section */
+.pricing-comparison {
+  margin-bottom: 64px;
+}
+
+.pricing-section-title {
+  font-family: "Songti SC", "Source Han Serif SC", serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #f7f8fa;
+  margin: 0 0 24px;
+  text-align: center;
+}
+
+.pricing-table-wrap {
+  overflow-x: auto;
+  background: rgba(20, 24, 30, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  backdrop-filter: blur(8px);
+}
+
+.pricing-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.pricing-table th,
+.pricing-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pricing-table th {
+  background: rgba(255, 255, 255, 0.02);
+  color: rgba(240, 242, 245, 0.7);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.pricing-table th:first-child {
+  width: 34%;
+}
+
+.pricing-table th:nth-child(2),
+.pricing-table th:nth-child(3),
+.pricing-table th:nth-child(4) {
+  width: 22%;
+  text-align: center;
+}
+
+.pricing-table td:nth-child(2),
+.pricing-table td:nth-child(3),
+.pricing-table td:nth-child(4) {
+  text-align: center;
+}
+
+.pricing-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.pricing-table .col-featured {
+  color: #ecd7af;
+  font-weight: 500;
+}
+
+.pricing-table .text-muted {
+  color: rgba(240, 242, 245, 0.35);
+}
+
+/* FAQ / Notes Section */
+.pricing-notes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.pricing-note-card {
+  background: rgba(20, 24, 30, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+.pricing-note-card__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ecd7af;
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pricing-note-card__content {
+  font-size: 13px;
+  color: rgba(240, 242, 245, 0.65);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.pricing-legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 20px;
+  font-size: 0.74rem;
+}
+
+.pricing-legal-links a {
+  color: #ecd7af;
+  text-underline-offset: 3px;
+}
+
+/* Responsive */
+@media (max-width: 860px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .pricing-notes {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-hero__title {
+    font-size: 28px;
+  }
+
+  .pricing-nav {
+    padding: 12px 16px;
+  }
+
+  .pricing-container {
+    padding: 32px 16px 60px;
+  }
+
+  .pricing-redeem {
+    grid-template-columns: 1fr;
+    margin-top: -36px;
+  }
+
+  .pricing-redeem__form { min-width: 0; }
+}
+
+@media (max-width: 480px) {
+  .pricing-redeem__controls { flex-direction: column; }
+}
+
+@keyframes breathe {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pricing-nav__brand .dot {
+    animation: none;
+  }
+  .pricing-card {
+    transition: none;
+  }
+}

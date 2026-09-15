@@ -1,0 +1,140 @@
+/* ===== 微光 · 全局设计令牌（单一来源，替代各页面重复的 :root） ===== */
+:root {
+  color-scheme: dark;
+  --bg: #000000;
+  --bg-soft: #0a0a0a;
+  --bg-card: rgba(var(--light-rgb), 0.035);
+
+  --line: rgba(var(--light-rgb), 0.1);
+  --line-strong: rgba(var(--light-rgb), 0.22);
+
+  --text: rgba(255, 255, 255, 0.92);
+  --text-mid: rgba(255, 255, 255, 0.6);
+  --text-dim: rgba(255, 255, 255, 0.38);
+  --text-faint: rgba(255, 255, 255, 0.22);
+
+  /* 光点色：微暖的白，像烛火而非冷光 */
+  --light: #fbf6ec;
+  --light-rgb: 251, 246, 236;
+  --light-glow: rgba(var(--light-rgb), 0.55);
+  --light-faint: rgba(var(--light-rgb), 0.12);
+  --theme-base: #000000;
+  --theme-base-rgb: 0, 0, 0;
+  --on-light: #1a1712;
+
+  --serif: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+  --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Helvetica Neue", sans-serif;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --maxw: 860px;
+}
+
+/* 抖音《世界级经典撞色合集》：原色色样保留，页面令牌同色系调暗或提亮以保证文字可读。 */
+:root[data-theme="mars-rose"] {
+  --bg: #041918;
+  --bg-soft: #082826;
+  --light: #f9d2e4;
+  --light-rgb: 249, 210, 228;
+  --theme-base: #01847f;
+  --theme-base-rgb: 1, 132, 127;
+}
+
+:root[data-theme="ivory-cinnabar"] {
+  --bg: #1b0708;
+  --bg-soft: #2b0c0f;
+  --light: #fffff0;
+  --light-rgb: 255, 255, 240;
+  --theme-base: #c01e25;
+  --theme-base-rgb: 192, 30, 37;
+}
+
+:root[data-theme="lemon-sea"] {
+  --bg: #041526;
+  --bg-soft: #08253f;
+  --light: #f0ff0a;
+  --light-rgb: 240, 255, 10;
+  --theme-base: #1e9bff;
+  --theme-base-rgb: 30, 155, 255;
+}
+
+:root[data-theme="cherry-clearwater"] {
+  --bg: #0d0b24;
+  --bg-soft: #181442;
+  --light: #f78a88;
+  --light-rgb: 247, 138, 136;
+  --theme-base: #3f389f;
+  --theme-base-rgb: 63, 56, 159;
+}
+
+:root[data-theme="amber-kingfisher"] {
+  --bg: #061114;
+  --bg-soft: #0c2228;
+  --light: #f9b800;
+  --light-rgb: 249, 184, 0;
+  --theme-base: #153c46;
+  --theme-base-rgb: 21, 60, 70;
+}
+
+:root[data-theme="cloud-cyan"] {
+  --bg: #031719;
+  --bg-soft: #06272a;
+  --light: #f8ffff;
+  --light-rgb: 248, 255, 255;
+  --theme-base: #00b7c7;
+  --theme-base-rgb: 0, 183, 199;
+}
+
+:root[data-theme="ice-wine"] {
+  --bg: #18070d;
+  --bg-soft: #2a0c16;
+  --light: #88e7d2;
+  --light-rgb: 136, 231, 210;
+  --theme-base: #a82f4f;
+  --theme-base-rgb: 168, 47, 79;
+}
+
+:root[data-theme="barbie-moss"] {
+  --bg: #0c1108;
+  --bg-soft: #182010;
+  --light: #f1bbc9;
+  --light-rgb: 241, 187, 201;
+  --theme-base: #4d613c;
+  --theme-base-rgb: 77, 97, 60;
+}
+
+:root[data-theme="blaze-neon"] {
+  --bg: #050407;
+  --bg-soft: #0a090c;
+  --light: #ff4d55;
+  --light-rgb: 255, 77, 85;
+  --theme-base: #0a090c;
+  --theme-base-rgb: 10, 9, 12;
+  --on-light: #0a090c;
+}
+
+:root[data-theme="mint-brick"] {
+  --bg: #150b07;
+  --bg-soft: #26140d;
+  --light: #bbf0ea;
+  --light-rgb: 187, 240, 234;
+  --theme-base: #8d4726;
+  --theme-base-rgb: 141, 71, 38;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}

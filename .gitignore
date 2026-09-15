@@ -1,0 +1,77 @@
+# =============================================================================
+# 微光（Weiguang）项目 .gitignore
+# =============================================================================
+
+# ── 敏感凭据（已追踪需 git rm --cached） ──────────────────
+.env
+.env.*
+!.env.example
+
+# ── Python ──────────────────────────────────────────────────
+.venv/
+.venv
+.venv-*/
+**/__pycache__/
+.pytest_cache/
+.mypy_cache/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# ── Node.js / 前端 ──────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend-admin/node_modules/
+frontend-admin/dist/
+
+# ── Go 构建 ─────────────────────────────────────────────────
+*.exe
+*.test
+*.out
+
+# ── 本地配置与运行时 ────────────────────────────────────────
+config.json
+certs/
+
+# ── 旧遗留代码（已追踪需 git rm --cached） ─────────────────
+backend/
+frontend-admin/
+static/
+docs-app/
+playbook/
+
+# ── Agent 配置（非项目代码） ───────────────────────────────
+.agent/
+agency-agents/
+
+# ── IDE / 编辑器 ────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.zcode/
+
+# ── 运行时数据 ─────────────────────────────────────────────
+data/
+tmp/
+temp/
+tests/results/
+
+# ── 模型权重与大型资源（用户自行准备） ───────────────────────
+*.safetensors
+MiniCPMO45/assets/
+resources/
+
+# ── 其他 ────────────────────────────────────────────────────
+torch_compile_cache/
+AutoAWQ/
+dev_tools/
+.wrangler/
+benchmark.json
+.run-logs/
+.cursor/
+public/
+release/

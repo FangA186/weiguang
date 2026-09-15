@@ -1,0 +1,2129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>微光（Weiguang）- 项目进度与排障解决宝典</title>
+  <style>
+    :root {
+      --bg-primary: #0b0f17;
+      --bg-card: #131b2a;
+      --bg-card-hover: #1a253a;
+      --bg-glass: rgba(19, 27, 42, 0.75);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(99, 102, 241, 0.5);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent-cyan: #38bdf8;
+      --accent-indigo: #818cf8;
+      --accent-emerald: #34d399;
+      --accent-amber: #fbbf24;
+      --accent-rose: #f43f5e;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #172554 0%, #0b0f17 40%, #05070a 100%);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      line-height: 1.6;
+      padding-bottom: 80px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+    }
+    .badge-glow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--accent-cyan);
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 9999px;
+      margin-bottom: 16px;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+    }
+    .badge-glow::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: var(--accent-cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-cyan);
+    }
+    h1 {
+      font-size: 36px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffffff 30%, var(--accent-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 16px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* Metric Cards */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+    .metric-card {
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .metric-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-focus);
+    }
+    .metric-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .metric-value {
+      font-size: 32px;
+      font-weight: 700;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .metric-value.cyan { color: var(--accent-cyan); }
+    .metric-value.emerald { color: var(--accent-emerald); }
+    .metric-value.indigo { color: var(--accent-indigo); }
+    .metric-value.amber { color: var(--accent-amber); }
+
+    /* Controls: Search & Tabs */
+    .controls-wrapper {
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 32px;
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    .search-box {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .search-box input {
+      width: 100%;
+      background: rgba(11, 15, 23, 0.8);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 14px 18px 14px 44px;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-box input:focus {
+      border-color: var(--accent-indigo);
+      box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
+    }
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover {
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .tab-btn.active {
+      background: var(--accent-indigo);
+      border-color: var(--accent-indigo);
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(129, 140, 248, 0.35);
+    }
+
+    /* Section Layout */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 36px 0 20px 0;
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title span.count {
+      font-size: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 8px;
+      border-radius: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      transition: all 0.2s;
+    }
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .feature-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .feature-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+    .tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+    .tag-emerald { background: rgba(52, 211, 153, 0.15); color: var(--accent-emerald); border: 1px solid rgba(52, 211, 153, 0.3); }
+    .tag-cyan { background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .tag-indigo { background: rgba(129, 140, 248, 0.15); color: var(--accent-indigo); border: 1px solid rgba(129, 140, 248, 0.3); }
+    .tag-amber { background: rgba(251, 191, 36, 0.15); color: var(--accent-amber); border: 1px solid rgba(251, 191, 36, 0.3); }
+
+    .feature-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+    .feature-files {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #64748b;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 6px 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    /* Troubleshooting / Issues Accordion */
+    .issues-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .issue-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .issue-item:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .issue-header {
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      gap: 16px;
+    }
+    .issue-header:hover {
+      background: var(--bg-card-hover);
+    }
+    .issue-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+    .issue-id {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-rose);
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .issue-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .issue-arrow {
+      color: var(--text-muted);
+      font-size: 14px;
+      transition: transform 0.2s;
+    }
+    .issue-item.open .issue-arrow {
+      transform: rotate(180deg);
+    }
+    .issue-body {
+      display: none;
+      padding: 0 22px 22px 22px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(11, 15, 23, 0.3);
+    }
+    .issue-item.open .issue-body {
+      display: block;
+    }
+
+    .issue-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    @media (max-width: 768px) {
+      .issue-grid { grid-template-columns: 1fr; }
+    }
+    .block {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+    }
+    .block-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .block-label.symptom { color: var(--accent-amber); }
+    .block-label.cause { color: var(--accent-rose); }
+    .block-label.solution { color: var(--accent-emerald); }
+    .block-label.verify { color: var(--accent-cyan); }
+    .block-content {
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+    .code-snippet {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: #05070a;
+      color: #38bdf8;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-top: 8px;
+      overflow-x: auto;
+    }
+
+    /* Roadmap List */
+    .roadmap-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .roadmap-info h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .roadmap-info p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 60px;
+      color: #475569;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="badge-glow">微光 AI 核心工程资产</div>
+      <h1>项目进度跟踪与排障解决宝典</h1>
+      <p class="subtitle">记录已开发功能、已修复缺陷与核心排障知识库。开发与排障前请先查阅本库。</p>
+    </header>
+
+    <!-- Metrics KPI -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-title">已上线核心功能</div>
+        <div class="metric-value emerald">20 <span style="font-size:14px;color:var(--text-muted)">项</span></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">已攻克排障经验</div>
+        <div class="metric-value cyan">49 <span style="font-size:14px;color:var(--text-muted)">例</span></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">规划与实施中方案</div>
+        <div class="metric-value amber">10 <span style="font-size:14px;color:var(--text-muted)">项</span></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-title">全双工链路健康度</div>
+        <div class="metric-value indigo">100% <span style="font-size:14px;color:var(--text-muted)">Full-Duplex</span></div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls-wrapper">
+      <div class="search-box">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="searchInput" placeholder="搜索问题现象、根因关键词、报错代码（如：19103、listen、爆音、think、WebSocket）..." />
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" data-filter="all">全部 (All)</button>
+        <button class="tab-btn" data-filter="troubleshoot">🛠️ 排障宝典 (Troubleshooting)</button>
+        <button class="tab-btn" data-filter="features">✨ 已上线功能 (Features)</button>
+        <button class="tab-btn" data-filter="audio">🎙️ 音频双工 (Audio)</button>
+        <button class="tab-btn" data-filter="llm">🧠 模型推理 (LLM/TTS)</button>
+        <button class="tab-btn" data-filter="db">🗄️ 数据库鉴权 (Auth/DB)</button>
+      </div>
+    </div>
+
+    <!-- Section: Troubleshooting Knowledge Base -->
+    <div class="section-container" id="troubleshootSection">
+      <div class="section-header">
+        <div class="section-title">
+          🛠️ 历史排障解决宝典（遇到问题先查此处）
+          <span class="count" id="troubleshootCount">61</span>
+        </div>
+      </div>
+
+      <div class="issues-list" id="issuesContainer">
+
+        <!-- Issue 01 -->
+        <div class="issue-item" data-category="troubleshoot audio">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-01</span>
+              <span class="issue-title">本机 19103 连接被拒绝 (connection refused 127.0.0.1:19103)</span>
+              <span class="tag tag-cyan">网络 / 隧道</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">前端发起实时语音时报错 <code>connection refused 127.0.0.1:19103</code>，光球变红并提示 MiniCPM-o 接口无法连接。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根本原因</div>
+                <div class="block-content">SSH 隧道未启动，或在临时 Shell 启动被桌面终端退出时 kill；远端 4090 MiniCPM-o Worker OOM 崩溃。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复方案</div>
+                <div class="block-content">
+                  1. 检查本机端口：<code>lsof -nP -iTCP:19100-19104 -sTCP:LISTEN</code><br/>
+                  2. 前台拉起隧道：<code>deploy/opensource/start-minicpm-tunnel.sh "$REMOTE_HOST" "$REMOTE_PORT"</code><br/>
+                  3. 检查远端端口：<code>ss -lntp | rg '19080|19082'</code>
+                </div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证与文件</div>
+                <div class="block-content">
+                  文件：<code>deploy/opensource/start-minicpm-tunnel.sh</code><br/>
+                  验证：<code>curl -I http://127.0.0.1:19100</code> 确认能正常响应。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 02 -->
+        <div class="issue-item" data-category="troubleshoot audio">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-02</span>
+              <span class="issue-title">MiniCPM-o WebSocket 1000 异常断开或会话初始化被拒绝</span>
+              <span class="tag tag-indigo">全双工 / 握手</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">实时语音建立连接后立即收到 WebSocket Close 1000 报错，提示会话初始化失败。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根本原因</div>
+                <div class="block-content">后端连错 HTTP 端口未指向 <code>/backend</code>；参考音色 GPU 显存 cold-start 预热超过了默认读取超时。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复方案</div>
+                <div class="block-content">
+                  1. 将握手读取超时放宽至 60 秒（<code>SetReadDeadline(time.Now().Add(60*time.Second))</code>）。<br/>
+                  2. 增加 Worker 容灾快速轮询重试逻辑，一个挂掉立即切换另一张卡。
+                </div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证与文件</div>
+                <div class="block-content">
+                  文件：<code>internal/opensource/omni_relay.go</code><br/>
+                  验证：冷启动 Worker 进程后连接，确认 60s 预热窗口内平稳初始化。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 03 -->
+        <div class="issue-item" data-category="troubleshoot audio llm">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-03</span>
+              <span class="issue-title">模型陷入死循环只返回 listen，无文本和音频输出</span>
+              <span class="tag tag-amber">协议字段 / VAD</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">用户对着麦克风说话，后端只收到 <code>kind=listen</code> 的 delta，模型一直“倾听”从不说话。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根本原因</div>
+                <div class="block-content">
+                  1. 误用了 <code>audio_base64</code> 而非 <code>input.audio</code>；<br/>
+                  2. 误传了 <code>force_listen: true</code> 导致模型被强制禁言；<br/>
+                  3. 前端静音门控将低能量音频全丢弃。
+                </div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复方案</div>
+                <div class="block-content">
+                  显式发送 <code>{"input":{"audio": b64, "force_listen": false, "max_slice_nums": 1}}</code>，且在 init 中设置 <code>"ls_mode": "explicit"</code>。
+                </div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证与文件</div>
+                <div class="block-content">
+                  文件：<code>internal/opensource/omni_relay.go</code><br/>
+                  验证：说话后立即出现 <code>chat.delta</code> 和 <code>tts.start</code>。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 04 -->
+        <div class="issue-item" data-category="troubleshoot audio">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-04</span>
+              <span class="issue-title">语音重复播放、多段音频交织或旧音频串入新会话</span>
+              <span class="tag tag-rose">回声自激 / 播放边界</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">AI 说话时同一句话播放两次、重叠杂音，或上一轮尾音混入新对话自问自答。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根本原因</div>
+                <div class="block-content">
+                  1. 误将 <code>response.done</code> 作为音频结束；<br/>
+                  2. 外放扬声器尾音被麦克风重新采集触发回声自激；<br/>
+                  3. 手动 TTS 与实时语音未互斥。
+                </div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复方案</div>
+                <div class="block-content">
+                  1. 严格以 <code>kind=listen</code> 作为回合结束边界；<br/>
+                  2. 增加 350ms 扬声器尾音冷却过滤门控；<br/>
+                  3. 持久 Worklet 单例管理 + 递增 <code>playbackEpoch</code>。
+                </div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证与文件</div>
+                <div class="block-content">
+                  文件：<code>omni_relay.go</code>, <code>playback-worklet.js</code><br/>
+                  验证：外放音箱连续 5 轮对话及打断，无重复无回声。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 05 -->
+        <div class="issue-item" data-category="troubleshoot audio">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-05</span>
+              <span class="issue-title">音频开始播放时出现“咚”一声爆音/点击音 (Click/Pop)</span>
+              <span class="tag tag-cyan">DSP / 淡出</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">每次 AI 开始发声或用户抢话打断时，耳机中听到明显的“咚”一声爆破杂音。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根本原因</div>
+                <div class="block-content">清空队列时直接将正在输出的 PCM 缓冲区硬切置零，产生直流阶跃冲击（DC Offset 突变）。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复方案</div>
+                <div class="block-content">
+                  在 <code>playback-worklet.js</code> 清空时，对末尾 64 个采样应用极短线性淡出（Fade-out）曲线平滑归零；Float32 转换严格限制在 [-1, 1]。
+                </div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证与文件</div>
+                <div class="block-content">
+                  文件：<code>frontend/public/playback-worklet.js</code><br/>
+                  验证：戴耳机连续打断 20 次，完全无爆破杂音。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 06 -->
+        <div class="issue-item" data-category="troubleshoot llm">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-06</span>
+              <span class="issue-title">文字回复与 TTS 中泄漏 &lt;think&gt; 思维链标签</span>
+              <span class="tag tag-indigo">思维链 / 过滤</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">打字回复或语音朗读时，屏幕出现 <code>&lt;think&gt;</code> 标签，TTS 把思考过程也朗读了出来。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根本原因</div>
+                <div class="block-content">推理大模型流式输出跨分片将标签拆成了 <code>&lt;th</code> 与 <code>ink&gt;</code>，简单字符串替换失效。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复方案</div>
+                <div class="block-content">
+                  实现专门的状态机过滤器 <code>thinkFilter</code>，维护跨分片上下文缓冲，彻底剥离思考标签及其内部文本。
+                </div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证与文件</div>
+                <div class="block-content">
+                  文件：<code>internal/opensource/think_filter.go</code><br/>
+                  验证：高推理模型输入复杂问题，确认气泡与 TTS 仅有最终回答。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 07 -->
+        <div class="issue-item" data-category="troubleshoot audio">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-07</span>
+              <span class="issue-title">单次手动 TTS 与实时双工语音播放冲突</span>
+              <span class="tag tag-amber">前端状态机</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">点击文字消息 TTS 朗读同时开启光球实时语音，导致两路音频同时播放打架。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根本原因</div>
+                <div class="block-content">手动 TTS 异步拉取 PCM 后直接送入播放器，未与实时语音状态进行互斥联动。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复方案</div>
+                <div class="block-content">
+                  引入 <code>AbortController</code>、<code>audioRequestId</code> 与 <code>playbackEpoch</code>；开启实时语音时立即 abort 手动 TTS 并 stop 旧播放。
+                </div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证与文件</div>
+                <div class="block-content">
+                  文件：<code>frontend/src/views/ChatView.vue</code><br/>
+                  验证：长文本 TTS 加载时立刻开启光球说话，确认旧请求瞬间取消。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 08 -->
+        <div class="issue-item" data-category="troubleshoot db">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-08</span>
+              <span class="issue-title">本地开发 Vite 代理下 WebSocket 握手被 Origin 拒绝 (403)</span>
+              <span class="tag tag-cyan">跨域 / 代理</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">在 <code>localhost:5173</code> 前端调试时，连接 <code>ws://localhost:5173/api/realtime</code> 报错 403 Forbidden。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根本原因</div>
+                <div class="block-content">Vite 代理保留 Origin:5173，而 Go 后端收到 Host:8080，默认 Origin 检查认为端口不一致判定为非法跨域。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复方案</div>
+                <div class="block-content">
+                  在 Go <code>CheckOrigin</code> 中增加 <code>isLocalhost</code> 智能判断：当 Origin 和 Host 均为本机回环地址（localhost/127.0.0.1）时放行。
+                </div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证与文件</div>
+                <div class="block-content">
+                  文件：<code>internal/realtime/realtime.go</code>, <code>internal/opensource/opensource.go</code><br/>
+                  验证：Vite 开发环境下刷新重连 WebSocket，正常返回 101 Switching Protocols。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 09 -->
+        <div class="issue-item" data-category="troubleshoot db">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-09</span>
+              <span class="issue-title">高并发请求下免费额度扣减不一致与重复扣减</span>
+              <span class="tag tag-emerald">PostgreSQL / 事务</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">网络不稳时快速连续发消息可能导致重复扣费，或并发操作导致额度变负数。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根本原因</div>
+                <div class="block-content">额度检查与更新缺乏行锁与流水号唯一约束，客户端网络重试被当做多次新请求。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复方案</div>
+                <div class="block-content">
+                  在同一个 PostgreSQL 事务中原子执行 <code>UPDATE user_quotas</code> 与 <code>INSERT INTO quota_usage ... ON CONFLICT (request_id) DO NOTHING</code>。
+                </div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证与文件</div>
+                <div class="block-content">
+                  文件：<code>internal/auth/auth.go</code>, <code>001_accounts.sql</code><br/>
+                  验证：运行并发测试 <code>go test -v ./internal/auth -run TestQuotaConcurrent</code> 100% 通过。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 10 -->
+        <div class="issue-item" data-category="troubleshoot audio db">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-10</span>
+              <span class="issue-title">双工语音下首句后识别器锁死与语音输入占位符冗余</span>
+              <span class="tag tag-amber">语音转写 / 识别器自愈</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">语音对话时第 1 句能识别文字，从第 2 句开始右侧不再出字，且生成无意义的（语音输入）气泡。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根本原因</div>
+                <div class="block-content">
+                  1. <code>startLocalTranscript()</code> 中 <code>if (localRecognitionEnabled) return</code> 导致第 1 句结束后 <code>onend</code> 重启被自身拦截而永久停滞；<br/>
+                  2. 后端在 <code>kind=listen</code> 时盲目插入人工（语音输入）占位符。
+                </div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复方案</div>
+                <div class="block-content">
+                  1. 修复重启条件为 <code>if (!nativeSession || localRecognition) return</code>，实现停顿后 100ms 持续自愈；<br/>
+                  2. 彻底移除前后端人工占位符注入，真实转写自然入库。
+                </div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证与文件</div>
+                <div class="block-content">
+                  文件：<code>realtimeClient.ts</code>, <code>omni_relay.go</code>, <code>ChatView.vue</code><br/>
+                  验证：连续 5 轮语音对话，每句话均准确转写为实际文字。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 11 -->
+        <div class="issue-item" data-category="troubleshoot audio llm">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-11</span>
+              <span class="issue-title">播放开始时的“咚”一声冲击音与双工会话历史记忆预填</span>
+              <span class="tag tag-cyan">DSP 淡入 / 上下文预填</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">AI 每次开始回复时耳机“咚”一声爆音；询问模型之前的对话记录时模型回答“没有保存记录”。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根本原因</div>
+                <div class="block-content">
+                  1. <code>playback-worklet.js</code> 队列开始输出时首帧非零样本瞬间阶跃产生冲击波（Dirac Delta）；<br/>
+                  2. 双工建连时仅下发静态 system_prompt，未拉取历史记录预填。
+                </div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复方案</div>
+                <div class="block-content">
+                  1. 在 <code>playback-worklet.js</code> 队列开始播放时增加 20ms 平滑线性淡入（Fade-in）；<br/>
+                  2. 在 <code>connectNativeOmni</code> 初始化时调用 <code>initHistory</code> 并注入 <code>system_prompt</code>。
+                </div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证与文件</div>
+                <div class="block-content">
+                  文件：<code>playback-worklet.js</code>, <code>omni_relay.go</code><br/>
+                  验证：耳机听音发声丝滑无爆音；询问大模型前文历史能准确回答。
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 12: official demo replacement baseline -->
+        <div class="issue-item" data-category="troubleshoot architecture">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-12</span>
+              <span class="issue-title">官方 MiniCPM-o-Demo 替换后的运行边界与验证基线</span>
+              <span class="tag tag-cyan">官方基线 / 迁移</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题背景</div>
+                <div class="block-content">旧 Go/Gin + Vue 链路与官方 Demo 协议不同；用户要求采用官方实现，同时保留原有前端 UI 文件。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 官方边界</div>
+                <div class="block-content"><code>gateway.py</code>（默认 8006）负责公网路由，实时 WebSocket 为 <code>/v1/realtime</code>，内部模型 backend 路径为 <code>/backend</code>；官方运行页面在 <code>static/</code>。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 处理与验证</div>
+                <div class="block-content">移入官方提交并移出旧 Go 服务；现有 Vue UI 通过 Vite <code>/v1</code>/<code>/ws</code> 代理接入远端 Gateway；Python compileall、38 个 JS 测试、runtime media 2 个测试和 Chat WebSocket 端到端检查通过。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 已知限制</div>
+                <div class="block-content">远端双 RTX 4090 Gateway/Worker/backend healthy；Audio 已验证 session 与 listen 事件；Chrome 自然语音仍需人工验收，官方半双工 WS 当前 403。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 13: existing Vue page to remote official Gateway -->
+        <div class="issue-item" data-category="troubleshoot architecture audio">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-13</span>
+              <span class="issue-title">现有 Vue 页面接入远端官方 Gateway</span>
+              <span class="tag tag-cyan">SSH 隧道 / 官方协议</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">旧页面依赖已移出的 Go <code>/api/*</code> 与 <code>/api/realtime</code>，而模型必须在远端 GPU 的官方 Gateway/Worker/Backend 运行。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 官方边界</div>
+                <div class="block-content">官方 Chat/Audio 入口是 <code>/v1/realtime?mode=chat|audio</code>；当前 Gateway 未公开 <code>/ws/half_duplex/{session_id}</code>，该路径实际 403。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 处理与验证</div>
+                <div class="block-content">Vite 代理 <code>/v1</code>/<code>/ws</code> 到 SSH 隧道 8006；Vue Chat/Audio 载荷按官方生命周期发送；远端两个 Worker 注册并健康；本地代理 Chat WebSocket 端到端通过。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 当前边界</div>
+                <div class="block-content">文本不自动 TTS；语音转写仅用于页面显示；账户/历史 localStorage；半双工入口暂禁用，Chrome 自然语音仍需最终人工验收。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 14: official stream dedupe and mode handoff -->
+        <div class="issue-item" data-category="troubleshoot architecture audio">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-14</span>
+              <span class="issue-title">官方流式文本去重与文本/语音切换竞态</span>
+              <span class="tag tag-cyan">协议适配 / Worker 释放</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">同一回答同时出现在增量事件和 <code>response.done</code> 中，页面重复显示；文本和语音快速切换时偶发 Gateway/Worker HTTP 403。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根因</div>
+                <div class="block-content">适配器无条件追加两种文本事件；官方 Worker 的 finally 清理会等待可能挂起的 <code>runtime.aclose()</code>，旧连接长期保持 <code>duplex_active</code>，新的模式连接因此收到 403。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">按 <code>response_id</code> 去重；<code>RealtimeClient.close()</code> 可等待，模式切换在旧 WebSocket close 后留出 3.5 秒交接窗口；Worker close RPC 限时 3 秒并显式释放 runtime，重启后重新登记动态 Worker。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证</div>
+                <div class="block-content"><code>npm run build</code> 通过；Chrome 回归文本→全双工→停止→文本正常且无 403/loading；官方 Audio WebSocket 收到 <code>session.closed</code> 后 Worker 回到 idle；远端 Gateway/Worker health 全部正常。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 15: full-duplex playback echo and stale loading -->
+        <div class="issue-item" data-category="troubleshoot audio">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-15</span>
+              <span class="issue-title">全双工播放回声触发本地转写与 loading 残留</span>
+              <span class="tag tag-cyan">回声抑制 / 状态机</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">用户说“在吗”后，右侧出现与 AI 回复相同或相近的重复用户气泡；AI 播放结束、用户停止说话后，聊天区仍保留三点 loading。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根因</div>
+                <div class="block-content">Chromium <code>SpeechRecognition</code> 在扬声器播放期间接收本机回声；回声触发 <code>asr.ended</code> 后旧逻辑无条件显示 typing，而播放事件没有统一清理回合状态。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">首个官方音频增量发出 <code>realtime.speaking</code>，<code>kind=listen</code>、<code>playback.idle</code>、<code>socket.closed</code> 清理 typing/watchdog；播放期间及 1.2 秒尾音窗口过滤与最近 AI 文本高度相同的本地转写，不屏蔽不同内容的 Full-Duplex 打断。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证</div>
+                <div class="block-content"><code>npm run build</code> 通过；Chrome 空闲全双工 12 秒后 loading 为 0，停止语音后回到 idle 且 loading 为 0，控制台无 error/warn。自然语句仍需用户在刷新后实测。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 16: browser SpeechRecognition restart duplicates -->
+        <div class="issue-item" data-category="troubleshoot audio">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-16</span>
+              <span class="issue-title">Chrome 本地识别器重启导致同一语句连续冒泡</span>
+              <span class="tag tag-cyan">SpeechRecognition / 去重</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">同一句用户话语在右侧连续出现完整、前缀相近的多个气泡，随后用户感觉 AI 没有继续回复。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根因</div>
+                <div class="block-content">页面额外使用 <code>continuous=false</code> 的 Chrome 识别器，并在 <code>onend</code> 后自动重启；Chromium 在重启窗口可能重复返回 final 或前缀结果，旧逻辑还会把同一句拆成多个用户气泡。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">AI 首个音频增量到来时暂停本地识别器，保留原始麦克风 WebSocket 输入支持打断；播放队列 idle 后恢复；相同/高度相似 final 结果在 8 秒内去重，识别器重启延迟 250ms；<code>asr.ended</code> 不清空当前用户气泡，前缀结果会更新同一条气泡，首个模型输出或官方 <code>listen</code> 事件才结束回合。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证</div>
+                <div class="block-content"><code>npm run build</code> 通过；远端官方 Audio WebSocket 测试语音返回 text；Chrome 文本链路和语音开启/退出状态均正常。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue 17: delayed TTS deltas and stale worker sessions -->
+        <div class="issue-item" data-category="troubleshoot audio">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-17</span>
+              <span class="issue-title">TTS 音频迟到与旧会话占用 Worker</span>
+              <span class="tag tag-cyan">官方事件 / WebSocket 并发</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">远端已生成 TTS WAV，但页面偶尔只看到文本；旧标签页保持 <code>duplex_active</code> 后，后续请求不再回复。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根因</div>
+                <div class="block-content">T2W 回调线程与文本事件并发调用同一个 WebSocket <code>send</code>；并且官方音频增量可在 <code>response.done</code> 后到达，旧会话未释放会持续占用 Worker。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">远端 C++ backend 为所有事件共用发送锁；Worker close RPC 限时 3 秒；前端等待 close；重启后重新登记 22400/22401。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证</div>
+                <div class="block-content">官方原始 WebSocket 收到 text、<code>response.done</code> 之后的 audio 分片及 listen；Gateway/backend healthy；Chrome 停止语音后 loading 为 0，随后文本回复正常。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+        <!-- Issue 19: API audio echo re-entering speech recognition -->
+        <div class="issue-item" data-category="troubleshoot audio">
+          <div class="issue-header" onclick="toggleIssue(this)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-19</span>
+              <span class="issue-title">百炼音频播放被浏览器识别为下一轮输入</span>
+              <span class="tag tag-cyan">回声门控 / API 轮次</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">AI 音频播放期间，Chrome <code>SpeechRecognition</code> 把扬声器回声识别成新的用户消息并再次提交 API。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根因</div>
+                <div class="block-content"><code>HTMLAudioElement.play()</code> 返回后旧逻辑立即重启识别器，没有等待 <code>ended</code>。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">聊天页和全屏语音页增加 <code>audioPlaying</code> 与 700ms 尾音冷却；播放期间显示“回应中”，点击光球可停止本地音频并在冷却后恢复识别。</div>
+              </div>
+              <div class="block">
+        <div class="issue-card" data-category="troubleshoot audio">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-23</span>
+              <span class="issue-title">文本转语音未读取用户已克隆音色与模型未对齐</span>
+              <span class="tag tag-indigo">百炼 TTS / 音色绑定</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">在聊天页进行纯文本按需朗读（▶）或实时语音时，播放的声音依然是默认音色，未生效已克隆或已保存的音色。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根因</div>
+                <div class="block-content"><code>playOrSynthesizeMessage</code> 未传递 <code>voice.speaker</code>；后端接口模型未开放 <code>voice</code> 字段，且使用克隆音色时未自动关联解析其 <code>target_model</code>。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">后端增加统一音色与模型解析方法 <code>_resolve_tts_voice_and_model</code>；前端 <code>synthesizeMessageTTS</code> 与 <code>playOrSynthesizeMessage</code> 携带 <code>voice.speaker</code> 传参并确保加载就绪。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证</div>
+                <div class="block-content">前端 <code>npm run build</code> 零错误；Python 自动化测试验证指定克隆音色与数据库绑定音色均成功生成音频。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="issue-card" data-category="troubleshoot ui">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-24</span>
+              <span class="issue-title">截图导入弹窗未居中与入口布局优化</span>
+              <span class="tag tag-emerald">UI / 弹窗居中</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">打开截图导入弹窗时偏向左上方未在屏幕居中；底部输入框工具栏入口与聊天媒体发送容易混淆。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根因</div>
+                <div class="block-content"><code>.chat-import-dialog</code> 缺少 <code>margin: auto; position: fixed; inset: 0;</code> 导致浏览器默认靠左上角定位。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">完善弹窗固定定位与绝对居中样式；将「导入图片」入口迁移到页面右上角导航栏 <code>AppNav.vue</code> 操作区并绑定打开事件。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证</div>
+                <div class="block-content"><code>npm run build</code> 零错误；浏览器验证弹窗完美垂直水平居中，右上角按钮平滑调起。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="issue-card" data-category="troubleshoot ui">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-25</span>
+              <span class="issue-title">截图导入原图全屏放大与多级缩放预览</span>
+              <span class="tag tag-indigo">UI / 图像放大</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">审核页左侧“原图参考”尺寸受限，在核对密集文字、长图时点击原图无响应，无法看清细节。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根因</div>
+                <div class="block-content">左侧视图仅渲染了固定容器的缩略图 <code>&lt;img&gt;</code>，未接入图片放大灯箱（Lightbox）与缩放交互。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">在 <code>ChatImportDialog.vue</code> 增加 Teleport 全屏大图灯箱，支持点击图片调起、50%~300% 动态缩放、多张切换（←/→）与 Esc 退出。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证</div>
+                <div class="block-content"><code>npm run build</code> 零错误；浏览器点击左侧原图及“🔍 放大查看”按钮，流畅调起大图灯箱并支持缩放与导航。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot llm">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-26</span>
+              <span class="issue-title">Qwen 返回 null 字段导致整张截图提取失败</span>
+              <span class="tag tag-amber">OCR / JSON 容错</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">某条消息返回 <code>speaker: null</code> 或 <code>text: null</code> 时，整张截图解析失败。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根因</div>
+                <div class="block-content">Pydantic 模型原先要求字段必须是字符串，没有兼容模型对不可读字段返回 JSON null。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">增加 before validator，将空字段转成可审核占位符并设置 <code>needs_review=true</code>，保留同图其他消息。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证</div>
+                <div class="block-content"><code>scripts/test_screenshot_extractor_parse.py</code>、后端编译、前端构建和健康检查均通过。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot ui">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-27</span>
+              <span class="issue-title">截图审核页按图切换 OCR 记录与原图放大</span>
+              <span class="tag tag-indigo">UI / OCR 审核</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">多张截图的识别结果全部堆叠在右侧，底部缩略图只能切换原图；全屏放大层可能被原生 dialog 覆盖。</div>
+              </div>
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">按 source_attachment_id 筛选当前截图消息；合并服务端附件 ID；缩略图支持切换/双击放大；预览层移入 dialog top layer。</div>
+              </div>
+            </div>
+        <div class="issue-card" data-category="troubleshoot ui auth">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-28</span>
+              <span class="issue-title">个人中心体验优化、退出登录闭环与 Vite 代理 500 修复</span>
+              <span class="tag tag-emerald">UI / Auth / 代理</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">个人中心包含未接业务的授权上传与任务管理；原生滚动条粗重；退出登录无效果；/api/billing/summary 报 500 错误。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根因</div>
+                <div class="block-content">残留旧 Tab/授权模块；localProfile 永久默认兜底导致 isLoggedIn 永远为 true；Vite 开发服务器在沙箱模式下代理宿主机端口触发 EPERM。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">移除授权上传与任务管理；引入精致暗色细滚动条；重构登录/登出状态流并清除缓存；配置 Vite 网络直通。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证</div>
+                <div class="block-content"><code>npm run build</code> 零错误；弹窗紧凑美观；退出登录瞬间重置状态；/api/billing/summary 稳定返回 200 OK。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot audio ui">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-30</span>
+              <span class="issue-title">按需朗读暂停续播与会话内音频缓存</span>
+              <span class="tag tag-amber">Audio / 待 Chrome 复测</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">朗读暂停后再次播放会从头开始，刷新页面后还会重新请求 TTS 与远端音频。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根因</div>
+                <div class="block-content">暂停分支清零 currentTime 并销毁 Audio；缺少播放器归属和跨刷新的持久音频缓存。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">保留暂停进度、同消息复用播放器；首次合成后写入 Cache Storage，刷新后按用户、消息、正文和音色恢复；最多保留 30 条。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证</div>
+                <div class="block-content">前端构建通过；真实音频返回 206、audio/x-wav 与跨域许可。Chrome 刷新命中缓存与 Network 复测待完成。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot db auth ui">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-31</span>
+              <span class="issue-title">Local Storage 业务数据迁移 PostgreSQL</span>
+              <span class="tag tag-amber">DB / 浏览器面板待复核</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">账户、角色设置和聊天记录依赖 Local Storage，数据库旧历史与当前页面断开。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根因</div>
+                <div class="block-content">语音架构切换时临时改成本地兼容数据源，FastAPI 未提供数据库账户会话与聊天 API。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">新增 PostgreSQL 用户、HttpOnly Session、设置、聊天和故事表；事务迁移并回读后删除五个微光 Key。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证</div>
+                <div class="block-content">编译、构建、存储测试和 HTTP smoke 通过；当前用户 5 条消息、1 份设置、1 条故事与有效 Session 已回读。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot db">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-32</span>
+              <span class="issue-title">psycopg3 批量创建兑换码调用位置错误</span>
+              <span class="tag tag-emerald">已修复</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">批量插入兑换码时抛出 Connection 没有 executemany，整批事务回滚。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根因</div>
+                <div class="block-content">psycopg3 的 executemany 属于 Cursor API，不是 Connection API。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">在同一事务内创建游标并由 cursor.executemany 批量写入兑换码哈希。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证</div>
+                <div class="block-content">数据库和 API 闭环通过；同一码并发提交 100 次只有 1 次成功。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot ui">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)">
+            <div class="issue-title-wrap">
+              <span class="issue-id">ISSUE-33</span>
+              <span class="issue-title">独立购买页未使用路由变量导致构建失败</span>
+              <span class="tag tag-emerald">已修复</span>
+            </div>
+            <div class="issue-arrow">▼</div>
+          </div>
+          <div class="issue-body">
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label symptom">⚠️ 问题现象</div>
+                <div class="block-content">PurchaseView 构建时报 TS6133，router 变量声明后未使用。</div>
+              </div>
+              <div class="block">
+                <div class="block-label cause">🔍 根因</div>
+                <div class="block-content">页面只读 useRoute 参数，却同时创建了不需要的 useRouter 返回值。</div>
+              </div>
+            </div>
+            <div class="issue-grid">
+              <div class="block">
+                <div class="block-label solution">💡 修复</div>
+                <div class="block-content">删除未使用的 useRouter 导入和变量，保留当前路由参数读取。</div>
+              </div>
+              <div class="block">
+                <div class="block-label verify">✅ 验证</div>
+                <div class="block-content">前端生产构建通过；Plus顺延提示与Pro跨档购买禁用已用当前登录态验证。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot security billing">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-34</span><span class="issue-title">伪造用户 Header 绕过额度归属</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label solution">💡 修复与验证</div><div class="block-content">Provider 入口只接受 HttpOnly Session；生产 Secure Cookie + 可信 Origin。无 Cookie、伪造 Header 和恶意 Origin 均在 Provider 前拒绝。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot db billing">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-35</span><span class="issue-title">并发额度超卖与 request_id 重放</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 验证</div><div class="block-content">PostgreSQL 行锁、advisory lock 与 terminal expired；100 并发同 ID 仅一次 Provider，剩余 50 次时仅 50 个不同请求成功。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot db billing">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-47</span><span class="issue-title">缺少生产监控与成本告警</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 验证</div><div class="block-content">内部监控API与告警脚本已接入。真实7天汇总88请求、11.36%失败/取消率、成本估算0.238975元；缺失历史成本遥测会明确告警。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot ui db billing">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-48</span><span class="issue-title">运营管理与生产监控缺乏统一 Web 可视化界面</span><span class="tag tag-emerald">已上线</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 修复与验证</div><div class="block-content">全量实现生产监控大盘（原生SVG趋势图、4大KPI、模型拆分、30s自适应轮询）、Token/TTS成本分析、权益交易账本、用户管理（搜索/禁用会话原子注销/编辑）与对话正文回溯。自动化测试全过，前端构建 0 错误。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot audio billing">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-36</span><span class="issue-title">流式部分输出与多模态用量漏记</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label solution">💡 修复</div><div class="block-content">统计全部 messages；文字/PCM 下发即确认；流式 PCM 按预留上限裁剪并保存供应商与交付差额。非流式结果后计量仍属灰度边界。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot db billing">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-46</span><span class="issue-title">免费体验每30天自动续发</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 修复与验证</div><div class="block-content">持久化一次性体验标记；到期额度归零，shadow/hard均阻断，付费恢复但到期不返免费。真实PostgreSQL回归、前端构建和页面回显通过。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot db billing">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-37</span><span class="issue-title">同档续费合并两个额度周期</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 验证</div><div class="block-content">当前周期与 access_end/未来 grant 分离；周期边界 100 并发只切换一次，新周期用量归零，跨档拒绝不消耗码。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot audio db billing">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-38</span><span class="issue-title">Pro 多音色与远端/本地状态不一致</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label solution">💡 修复与验证</div><div class="block-content">新增 voice_clone_operations 与 claim lease；远端孤儿持续占槽并有界恢复。真实本地 PostgreSQL 验证并发恢复不重复调用远端。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot security billing">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-39</span><span class="issue-title">全局 hard 无法灰度单个内部账号</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 验证</div><div class="block-content">增加稳定用户 ID 白名单；全局保持 shadow，内部账号回显 hard 并在数据库故障时失败关闭，普通账号继续 shadow。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot infra">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-40</span><span class="issue-title">nohup 服务随自动化终端退出</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label solution">💡 修复与验证</div><div class="block-content">新增一键 zsh 脚本，使用 macOS launchctl 启动 FastAPI/Vite。真实停止后恢复、跨命令存活、重复执行和任意目录调用均通过。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot audio llm">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-41</span><span class="issue-title">语音消息首次朗读误报格式无效</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label solution">💡 修复与验证</div><div class="block-content">实时播放时保留全部 PCM 分片并按原顺序封装成 WAV 缓存，播放键直接复用同一份音频，不再保存最后一个分句 URL或二次合成。4 条专项测试与前端构建通过。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot audio llm">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-42</span><span class="issue-title">简单语音问题等待近 30 秒</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 根因与验证</div><div class="block-content">qwen3.5-flash 默认开启隐藏思考，LLM 首字实测 16.627 秒，TTS 首包仅 0.518 秒。关闭聊天思考后，完整鉴权、计费与 SSE 链路首字 429ms、首个音频 1041ms。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot audio">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-43</span><span class="issue-title">实时语音期间提前显示播放键</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label solution">💡 修复</div><div class="block-content">从语音请求开始到全部音频播放结束，隐藏所有朗读按钮，避免旧消息播放打断当前回复；结束或异常退出后恢复，文字对话不受影响。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot audio">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-44</span><span class="issue-title">聆听时手动音频回灌识别</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label solution">💡 修复</div><div class="block-content">整个语音会话期间隐藏并禁止朗读；进入语音会话前先停止手动音频，防止扬声器内容被 SpeechRecognition 识别成下一轮输入。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot audio billing">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-45</span><span class="issue-title">打断只停播放器但继续生成扣量</span><span class="tag tag-emerald">核心已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 验证</div><div class="block-content">聊天页与全屏页均端到端 abort SSE/Provider。真实中断只结算已发送的19,200 PCM字节，即0.40秒；后续用量稳定、预留归零。待Chrome自然麦克风光球交互复核。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot db billing">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-46</span><span class="issue-title">免费体验到期后每30天自动续发额度</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 验证</div><div class="block-content">新增 free_trial_started_at 并回填全部现有账号；新账号只在首次订阅创建时获得30天；到期无 grant 进入 expired，额度上限归零且 shadow/hard 均阻断；兑换付费后恢复，付费到期不返免费。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot db billing infra">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-47</span><span class="issue-title">缺少生产用量、成本和异常告警入口</span><span class="tag tag-emerald">已上线</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 验证</div><div class="block-content">复用 BillingStore 聚合1–168小时用量；按百炼北京公开价估算 Qwen3.5-Flash 和 Qwen-Audio-TTS 成本；增加预算、失败率、过期/悬挂预留、原始用量缺失告警；端点仅内部 hard 白名单可读，脚本 check_monitoring.py 退出码供调度。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot db ui">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-48</span><span class="issue-title">运营管理与生产监控缺乏统一 Web 可视化界面</span><span class="tag tag-emerald">已上线</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 验证</div><div class="block-content">应用 009 SQL 迁移与后端 require_admin_user_id 鉴权；提供 24h/7d 监控大盘、SVG 趋势图、Token 成本排行、交易账本、用户管理（资料/备注编辑、禁用并原子吊销 Session）与会话/消息正文审查。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot ui infra security">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-49</span><span class="issue-title">管理后台与客户端混编导致安全边界模糊与打包冗余</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 验证</div><div class="block-content">创建独立 Vue 3 工程 frontend-admin/（端口 5174）与独立登录门禁 LoginView；彻底清除客户端 frontend/ 内部运维组件与路由；更新 start-weiguang.zsh 一键拉起 4 大服务。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot security auth">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-50</span><span class="issue-title">独立后台登录时后端报“请求来源不受信任”拦截 (403 untrusted_origin)</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 验证</div><div class="block-content">在 backend/config.py 中将 http://localhost:5174 与 http://127.0.0.1:5174 加入可信来源白名单，允许独立管理后台发起安全状态变更。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot auth admin">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-51</span><span class="issue-title">管理后台登录时 API 响应解构错误导致管理员误判拦截</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 验证</div><div class="block-content">修正 frontend-admin/src/api/index.ts 登录返回类型，直接将 Profile 对象赋予 Pinia profile.value，准确放行管理员角色。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot oss storage">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-52</span><span class="issue-title">聊天历史图片附件加载 403 Forbidden (Request has expired, 0002-00000069)</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label verify">✅ 验证</div><div class="block-content">在 GET /api/chat-history 与管理员消息审查接口中遍历附件，通过 OSSProvider 动态重新签名生成有效临时下载链接，彻底解决私有 Bucket 附件过期导致的 403 裂图。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot ui ocr persona">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-53</span><span class="issue-title">OCR 人设字段未回填且将“系统消息”误作角色名称</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label solution">💡 修复与验证</div><div class="block-content">加载工坊时将描述型 MBTI/依恋类型归一化为可选枚举，补齐16型 MBTI；OCR 自动命名跳过系统/时间/AI 标签及用户侧消息。音色选择与克隆按钮改为同一横向控件组；专项 Python 自检和前端构建均通过。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot ui persona">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-54</span><span class="issue-title">原生音色下拉框与头部动作组视觉不一致</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label solution">💡 修复与验证</div><div class="block-content">用项目内深色音色菜单替换 Chrome 原生 option 弹层；保存、删除与克隆按钮底部对齐。浏览器实测没有系统白底/蓝色高亮，Escape 仅关闭菜单。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot ui ocr storage">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-55</span><span class="issue-title">截图导入消息固定显示“对方”且无左右头像</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label solution">💡 修复与验证</div><div class="block-content">导入审核页新增左侧对方、右侧我头像上传入口；头像对象键和消息导入元数据持久化，读取时私有链接自动续签。新导入不再写入【对方】前缀，旧历史刷新后也会隐藏该前缀。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot ui db ocr">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-56</span><span class="issue-title">单一聊天记录无法按人物分组与 OCR 导入无分流选择</span><span class="tag tag-amber">待用户验收</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label solution">💡 已实现</div><div class="block-content">会话列表、创建、切换、指定会话读写与 OCR“继续当前会话/新建聊天”已实现；列表显示头像、名称、最后消息和时间。数据库迁移、编译和已有默认会话的浏览器展示已验证；未创建测试会话，等待真实新建或下一次 OCR 导入验收。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot ui db">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-57</span><span class="issue-title">旧会话列表头像缺失且列表宽度不可调整</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label solution">💡 修复与验证</div><div class="block-content">旧会话无头像时动态回退到最近的左侧导入头像；新增当前页面可拖拽的 156–360px 列表分隔条。浏览器刷新后显示真实头像，拖拽实测从 218px 调整为 296px。</div></div></div>
+        </div>
+        <div class="issue-card" data-category="troubleshoot ui ocr audio">
+          <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-58</span><span class="issue-title">OCR 人设与声音表现割裂，缺少可控语速和声音情绪</span><span class="tag tag-amber">待用户验收</span></div><div class="issue-arrow">▼</div></div>
+          <div class="issue-body"><div class="block"><div class="block-label solution">💡 已实现</div><div class="block-content">OCR 人格新增文字证据驱动的声音建议；角色工坊可覆盖速度、情绪、24/48k 输出与声音描述。实时聊天、全屏语音和历史朗读共用设置，流式 PCM/WAV 同步采样率。构建和专项编译测试通过，待真实 OCR/TTS 播放验收。</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="issue-card" data-category="troubleshoot audio">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-59</span><span class="issue-title">TTS 参数与缓存一致性修复</span><span class="tag tag-emerald">参数修复已验收</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">修正 HTTP/SSE 的 input.instruction，四入口贯通数值语速与采样率；选择项优先，缓存包含实际合成设置。离线测试与构建通过；真实24k/1倍速WAV时长2.160秒，48k/0.85倍速WAV时长2.541秒。OCR端到端产出和情绪听感尚未验收。</div></div>
+    </div>
+
+    <div class="issue-card" data-category="troubleshoot ui audio mobile">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-60</span><span class="issue-title">移动端首次进入语音页只显示微弱光晕</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">语音面板初始隐藏导致 Canvas 以 0×0 初始化且绘制循环停止。共享光球渲染器现用原生 ResizeObserver 在面板显示后重新测量并恢复动画；Chrome iPhone 12 Pro（390×844）实测粒子完整出现，控制台 0 条消息。</div></div>
+    </div>
+
+    <div class="issue-card" data-category="troubleshoot ui browser">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-61</span><span class="issue-title">Chrome 移动模拟器性能采集报错与 favicon 404</span><span class="tag tag-emerald">已定位并修复</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">CDP 证明 startTime 异常来自 Chrome 152 的 DevTools Performance Metrics 隔离上下文，并非微光源码。页面同时复用已有应用图标声明 favicon；生产构建通过，强制刷新后连续监听3秒异常数为0。</div></div>
+    </div>
+
+    <div class="issue-card" data-category="troubleshoot ui ocr audio">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-62</span><span class="issue-title">OCR 导入的对方消息无法转换语音</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">朗读按钮此前错误排除所有导入消息。现已允许导入的对方文本复用现有克隆音色、额度、缓存、播放和保存流程；导入的用户侧消息保持不朗读。回归7/7、生产构建通过，浏览器回读21/21条对方消息有朗读按钮、0/6条用户消息有按钮。</div></div>
+    </div>
+
+    <div class="issue-card" data-category="troubleshoot billing llm production">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-63</span><span class="issue-title">Pro 按次数计费缺少单次 LLM 成本硬上限</span><span class="tag tag-emerald">已完成</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">服务端按聊天、语音、纠偏、OCR、人设强制512/1024/4096/8192输出Token上限；限制2,000字符、24KB系统提示、48KB历史、96KB总文本与最近视觉上下文。成本流水和管理端已展示P95、length比例、裁剪量及套餐平均单次成本。Mock、真实本地PostgreSQL回归、两端构建和浏览器422边界均通过，未消耗真实百炼额度。</div></div>
+    </div>
+
+    <div class="issue-card" data-category="troubleshoot billing ui">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-64</span><span class="issue-title">免费体验周期由30天调整为7天</span><span class="tag tag-emerald">已完成</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">服务端权威周期、数据库默认值和已有纯免费账号均调整为一次性7天；套餐页读取服务端周期，个人中心只显示免费体验到期日。PostgreSQL原子回归、前端测试与构建通过，浏览器回读当前账号到期日为2026-09-15。</div></div>
+    </div>
+
+    <div class="issue-card" data-category="troubleshoot ui chat">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-65</span><span class="issue-title">中文输入法按回车选词时误发送消息</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">聊天输入框现会忽略 isComposing 和 keyCode 229 的输入法确认事件；普通 Enter 发送、Shift+Enter 换行保持不变。回归8/8、生产构建和Chrome组合态/普通态事件验证通过，未产生AI调用。</div></div>
+    </div>
+
+    <div class="issue-card" data-category="troubleshoot ui audio">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-66</span><span class="issue-title">克隆声音与音色设置入口语义混淆</span><span class="tag tag-emerald">已纠正</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">恢复顶部“克隆声音”文字按钮；同一弹窗按入口区分克隆与设置模式，下拉框右侧纯图标只进入已有音色设置，选择后立即保存。回归8/8、生产构建及Chrome双入口验收通过。</div></div>
+    </div>
+
+    <div class="issue-card" data-category="troubleshoot ui audio ocr">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-67</span><span class="issue-title">音色设置缺少声音表现配置且聊天标题固定</span><span class="tag tag-emerald">已完成</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">音色设置现复用完整声音表现表单并保存到当前角色；顶部标题跟随当前会话。回归9/9、无警告构建及Chrome双模式/标题验收通过。</div></div>
+    </div>
+
+    <div class="issue-card" data-category="troubleshoot audio api">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-68</span><span class="issue-title">自适应语音忽略下拉框所选音色</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">conversation_id只标识聊天。前端现对自适应语音显式传voice，后端按明确选择、角色绑定、系统默认的顺序解析；__default__强制系统音色，全屏语音同步。Mock、真实本地解析和Chrome拦截fetch验证通过，未调用百炼。</div></div>
+    </div>
+
+    <div class="issue-card" data-category="troubleshoot ui audio">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-69</span><span class="issue-title">克隆声音缺少高质量录音指导</span><span class="tag tag-emerald">已补充</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">克隆上传区新增官方录音建议：10–20秒单人连续清晰说话、正常语速、安静环境，并避免音乐、回声、杂音和其他人声。回归9/9、构建和Chrome显示验收通过。</div></div>
+    </div>
+
+    <div class="issue-card" data-category="troubleshoot ui audio ocr">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-70</span><span class="issue-title">音色无法重命名且OCR新会话缺少对方网名</span><span class="tag tag-emerald">已完成</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">音色设置支持本地展示名重命名并进行用户归属校验；OCR新建聊天要求填写对方网名并写入现有会话title，列表与顶部统一读取。Mock、回归10/10、构建、OpenAPI和Chrome编辑态通过，未制造测试会话。</div></div>
+    </div>
+
+    <div class="issue-card" data-category="troubleshoot ui chat ocr">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-71</span><span class="issue-title">对方网名误放到全局页面顶部</span><span class="tag tag-emerald">已纠正</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">全局顶部恢复“微光”；当前会话网名显示在右侧聊天主区域顶部正中并继续读取同一会话title。回归10/10、构建及Chrome中心点位置验收通过。</div></div>
+    </div>
+
+    <div class="issue-card" data-category="troubleshoot ui">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">ISSUE-72</span><span class="issue-title">全息卡假透明与中等宽度裁切</span><span class="tag tag-emerald">实验已修复</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">两次去背景都把棋盘格画进RGB，改为从透明画布原生生成并以sips确认RGBA；卡牌宽度从视口比例调整为min(460px, 42vw)，移动端使用min(360px, 86vw)。桌面交互和390×844无横向溢出检查通过。文件：marketing_assets/2026-09-08/holo-card-experiment/。</div></div>
+    </div>
+
+    <div class="issue-card" data-category="features ui">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">2026-09-09</span><span class="issue-title">多层全息卡网页实验</span><span class="tag tag-emerald">实验完成</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">保留原单图版，新增layered.html。卡底、RGBA透明人物、标题牌、说明牌、星光和镭射层使用不同translateZ景深，指针移动同步改变旋转和光点；桌面实测分层可见，390×844无横向溢出，右上角可返回旧版。无Blender、Three.js或新增依赖。</div></div>
+    </div>
+
+    <p>2026-09-09 · Vue + Three.js 全息卡本地实验：圆角卡体、视角镭射、分层人物与文字，支持拖转/翻面/材质/层次/光泽。构建与浏览器控件检查通过，390px无横向溢出；用户视觉验收待定。旧版保留，未使用Blender。</p>
+    <!-- Section: Features -->
+    <div class="issue-card" data-category="features security ui production">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">2026-09-05</span><span class="issue-title">三代理上线整改</span><span class="tag tag-emerald">代码级阻断项已修复</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">移动聊天/无障碍、迁移死锁/语音取消、账号注销/隐私协议、人设质量、依赖与生产部署均完成整改。15个后端脚本、19项前端测试、两套构建、Docker镜像、生产安全模式和真实浏览器移动三视图通过。发现并修复管理测试污染，恢复两名管理员且清理6个测试账号。正式上线仍待证书/生产启动、备份恢复、实单退款、远端删除、邮箱找回、长图切片和压力灰度。</div></div>
+    </div>
+    <div class="issue-card" data-category="features ui ocr">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">2026-09-05</span><span class="issue-title">用户头像统一为个人资料头像</span><span class="tag tag-emerald">已完成</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">OCR只保留对方头像入口；打字、语音转写和OCR导入的用户消息统一使用个人资料头像，无图显示昵称首字。SFC回归、构建及浏览器20条无头像消息回退检查通过；AI继续按会话隔离头像。</div></div>
+    </div>
+    <div class="issue-card" data-category="features auth ui">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">2026-09-05</span><span class="issue-title">账号头像与注册校验</span><span class="tag tag-amber">功能完成，待真实上传</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">个人中心可上传私有账号头像并在顶部显示；注册实时检查邮箱、密码四项条件和确认密码，后端同步校验并拒绝重复邮箱。数据库回滚测试、规则测试及构建通过；未写入测试头像，真实OSS上传和新账号流程待用户操作验收。</div></div>
+    </div>
+    <div class="issue-card" data-category="troubleshoot ui ocr">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">2026-09-05</span><span class="issue-title">AI 头像按会话隔离</span><span class="tag tag-emerald">浏览器已验证</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">纠正共享角色头像串到其他聊天的问题。AI回复只读取本会话头像，无图显示默认首字；撤销上次错误全局绑定，原图保留。浏览器验证新的聊天5条回复无图片，微光对话14张头像全部加载成功。本条替代此前全局角色头像展示方案。</div></div>
+    </div>
+    <div class="issue-card" data-category="troubleshoot ui ocr">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">2026-09-05</span><span class="issue-title">AI 回复显示角色头像</span><span class="tag tag-emerald">已实现并绑定</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">普通AI回复显示角色绑定头像，缺失或失败时使用名字首字。导入左侧头像可独立同步至当前角色，自动生成新角色也带入头像。私有对象键持久化、读取时续签。已为用户当前“欲.”绑定既有头像，数据库回读、回归和构建通过；刷新页面获取。</div></div>
+    </div>
+    <div class="issue-card" data-category="troubleshoot db ocr ui">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">2026-09-05</span><span class="issue-title">开始提取无响应与后端启动失败</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">005重放创建已被012淘汰的单会话唯一索引，导致多会话用户存在时后端启动失败；已移除该旧创建语句。提取点击立即显示额度检查进度、阻止重复点击，查询10秒超时后保留选图重试。隔离数据库迁移重放、前端流程测试和构建通过，FastAPI已恢复。</div></div>
+    </div>
+    <div class="issue-card" data-category="troubleshoot ui ocr audio">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">2026-09-05</span><span class="issue-title">OCR 声音画像可应用到当前角色</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">确认导入前明确显示声音应用目标，有当前角色时默认勾选，可取消。仅合并角色声音字段，更新失败会保留弹窗并停止确认；新生成角色路径保持独立。SFC流程、自适应回归、数据库回滚测试及前端构建通过。</div></div>
+    </div>
+    <div class="issue-card" data-category="troubleshoot ui ocr">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">2026-09-04</span><span class="issue-title">截图导入页增加长截图提示</span><span class="tag tag-emerald">已完成</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">上传区下方增加“禁止上传长截图”说明，提示内容过长、文字过小或超时会导致识别失败，并建议裁剪成多张正常比例截图。仅改提示文案与样式，上传接口保持不变；SFC测试与前端构建通过。</div></div>
+    </div>
+    <div class="issue-card" data-category="troubleshoot ui ocr">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">2026-09-04</span><span class="issue-title">截图导入点击背景误关闭</span><span class="tag tag-emerald">已修复</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">移除导入弹窗背景点击关闭；上传、识别、保存、蒸馏期间禁用关闭按钮并拦截Esc。空闲关闭和蒸馏成功退出保留。实际SFC关闭逻辑回归与前端构建通过；没有重跑OCR或创建导入数据。</div></div>
+    </div>
+    <div class="issue-card" data-category="troubleshoot audio ocr">
+      <div class="issue-header" onclick="toggleIssue(this.parentElement)"><div class="issue-title-wrap"><span class="issue-id">2026-09-04</span><span class="issue-title">语境自适应语音与 OCR 声音画像</span><span class="tag tag-amber">已实现，听感待验收</span></div><div class="issue-arrow">▼</div></div>
+      <div class="issue-body"><div class="block-content">新语音回合复用一次多模态LLM逐句规划，固定项优先，23+7官方标签白名单；正文不显示控制元数据。完整音频和计划持久化，过期按原计划重播。OCR审核与角色工坊共享声音维度表单。隔离/超时/取消/额度mock、真实数据库rollback回读、前端测试和构建通过；真实共情与庆祝样本返回2.400秒/4.648秒PCM。主观听感、完整OCR上传及端到端延迟对照待验收；无计划旧消息仍使用基调朗读。</div></div>
+    </div>
+    <div class="section-container" id="featuresSection">
+      <div class="section-header">
+        <div class="section-title">
+          ✨ 已上线核心功能清单 (Features)
+          <span class="count">21</span>
+        </div>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card" data-category="features ui">
+          <div class="feature-top">
+            <div class="feature-name">首页原色与 10 套全局撞色主题</div>
+            <span class="tag tag-emerald">已完成</span>
+          </div>
+          <div class="feature-desc">首页导航保留默认“微光原色”，项目内配色菜单固定在按钮下方展开，并可切换抖音撞色合集中的 10 套全局配色；当前单页会话跨页面保持，使用现有 CSS 令牌，不新增依赖、不写 localStorage，刷新恢复原色。</div>
+          <div class="feature-files">frontend/src/assets/styles/tokens.css · frontend/src/views/LandingView.vue · frontend/src/assets/styles/landing.css</div>
+        </div>
+
+        <div class="feature-card" data-category="features audio">
+          <div class="feature-top">
+            <div class="feature-name">参考音频在线可视化裁剪工具 (Audio Trimmer)</div>
+            <span class="tag tag-emerald">已上线</span>
+          </div>
+          <div class="feature-desc">纯前端 Web Audio API 解码与 Canvas 波形图动态渲染发光峰值；双端滑块与 ±0.5s 微调设置；百炼官方 10–20 秒最佳推荐时长标识；选区试听与动态光标；纯前端无损 16-bit PCM WAV 导出与一键原文件还原。</div>
+          <div class="feature-files">frontend/src/utils/audioEncoder.ts · frontend/src/components/AudioTrimmer.vue · frontend/src/components/VoiceSettingsDialog.vue · frontend/src/assets/styles/voice-api.css</div>
+        </div>
+
+        <div class="feature-card" data-category="features llm">
+          <div class="feature-top">
+            <div class="feature-name">Ex-Skill 五层人格蒸馏与记忆工坊（含 OCR 零门槛一键提炼）</div>
+            <span class="tag tag-emerald">已上线</span>
+          </div>
+          <div class="feature-desc">基于 AgentSkills 规范：五层 Persona（L0硬规则~L4冲突）、Memories 共同事实库、Prompt 动态编译、支持聊天截图 OCR 零门槛全自动提炼人格与称谓、工坊手动微调、对话实时调教纠偏与版本快照回滚。</div>
+          <div class="feature-files">backend/persona_store.py · backend/persona_distiller.py · frontend/src/components/PersonaWorkshopDialog.vue · frontend/src/components/ChatImportDialog.vue</div>
+        </div>
+
+        <div class="feature-card" data-category="features audio">
+          <div class="feature-top">
+            <div class="feature-name">百炼 API 轮次语音对话</div>
+            <span class="tag tag-emerald">已迁移</span>
+          </div>
+          <div class="feature-desc">浏览器 SpeechRecognition 采集一轮文本，FastAPI 统一调用百炼 LLM/TTS 并返回音频 URL。</div>
+          <div class="feature-files">backend/app.py · frontend/src/views/ChatView.vue</div>
+        </div>
+
+        <div class="feature-card" data-category="features audio">
+          <div class="feature-top">
+            <div class="feature-name">双卡 4090 负载均衡与粘性会话</div>
+            <span class="tag tag-cyan">高可用</span>
+          </div>
+          <div class="feature-desc">Worker 0 (:19080) / Worker 1 (:19082) 轮询分发，单会话全程锁定单卡，避免 KV 缓存漂移。</div>
+          <div class="feature-files">internal/opensource/omni_relay.go</div>
+        </div>
+
+        <div class="feature-card" data-category="features audio">
+          <div class="feature-top">
+            <div class="feature-name">百炼音频 URL 播放与下载</div>
+            <span class="tag tag-indigo">API 音频</span>
+          </div>
+          <div class="feature-desc">语音轮次由 FastAPI SSE 推送 LLM 文本增量和 Qwen-Audio-TTS PCM 分片；纯文本轮次走独立文本 SSE，不驱动语音状态。</div>
+          <div class="feature-files">backend/app.py · backend/providers/qwen_tts.py · frontend/src/lib/pcmStreamPlayer.ts</div>
+        </div>
+
+        <div class="feature-card" data-category="features db">
+          <div class="feature-top">
+            <div class="feature-name">账号体系与 HttpOnly 安全鉴权</div>
+            <span class="tag tag-emerald">已上线</span>
+          </div>
+          <div class="feature-desc">bcrypt 哈希存储、Redis 管理 720h TTL 会话，无客户端 Token 泄露风险。</div>
+          <div class="feature-files">internal/auth/auth.go</div>
+        </div>
+
+        <div class="feature-card" data-category="features db">
+          <div class="feature-top">
+            <div class="feature-name">免费额度原子事务与流水审计</div>
+            <span class="tag tag-emerald">已上线</span>
+          </div>
+          <div class="feature-desc">PostgreSQL 事务内原子扣减，quota_usage 唯一键约束，新用户赠送 20 次。</div>
+          <div class="feature-files">internal/auth/migrations/001_accounts.sql</div>
+        </div>
+
+        <div class="feature-card" data-category="features audio llm">
+          <div class="feature-top">
+            <div class="feature-name">百炼声音克隆与 OSS 上传</div>
+            <span class="tag tag-cyan">音色复刻</span>
+          </div>
+          <div class="feature-desc">前端申请临时 PUT 地址直传私有 OSS，后端调用 voice-enrollment 创建音色并按用户保存 voice_id 与参考音频元数据。</div>
+          <div class="feature-files">backend/voice_store.py · backend/providers/qwen_voice_clone.py · frontend/src/components/VoiceSettingsDialog.vue</div>
+        </div>
+
+        <div class="feature-card" data-category="features llm">
+          <div class="feature-top">
+            <div class="feature-name">角色设定与百炼 TTS 指令</div>
+            <span class="tag tag-indigo">API 参数</span>
+          </div>
+          <div class="feature-desc">角色设定作为 system/instruction 传入 `/api/chat-and-tts`，旧 IndexTTS 参数已移除。</div>
+          <div class="feature-files">backend/providers/qwen_tts.py · frontend/src/api/index.ts</div>
+        </div>
+
+        <div class="feature-card" data-category="features audio">
+          <div class="feature-top">
+            <div class="feature-name">纯 API Provider 边界</div>
+            <span class="tag tag-emerald">当前路线</span>
+          </div>
+          <div class="feature-desc">浏览器不接触供应商密钥；所有模型调用集中在 FastAPI providers，前端只消费业务 API。</div>
+          <div class="feature-files">backend/app.py · backend/providers/</div>
+        </div>
+
+        <div class="feature-card" data-category="features">
+          <div class="feature-top">
+            <div class="feature-name">3D 粒子光球状态机与伴聊视图</div>
+            <span class="tag tag-amber">UI 交互</span>
+          </div>
+          <div class="feature-desc">idle / listening / thinking / speaking 四状态平滑过渡，支持伴聊与全屏语音视图。</div>
+          <div class="feature-files">frontend/src/views/ChatView.vue</div>
+        </div>
+
+        <div class="feature-card" data-category="features db">
+          <div class="feature-top">
+            <div class="feature-name">账户、设置与聊天 PostgreSQL 持久化</div>
+            <span class="tag tag-amber">已迁移，待面板复核</span>
+          </div>
+          <div class="feature-desc">账户、HttpOnly 会话、角色设置、聊天和故事以 PostgreSQL 为唯一权威数据源；本机旧数据事务迁移并回读后清除微光 Local Storage。</div>
+          <div class="feature-files">backend/app_data_store.py · backend/migrations/005_app_data_persistence.sql · backend/app.py · frontend/src/api/index.ts</div>
+        </div>
+
+        <div class="feature-card" data-category="features llm">
+          <div class="feature-top">
+            <div class="feature-name">Qwen3.5-Flash 图片与视频多模态对话</div>
+            <span class="tag tag-emerald">已上线</span>
+          </div>
+          <div class="feature-desc">支持 JPG/PNG/WEBP（≤10MB，≤4张）与 MP4/MOV/WEBM（≤50MB，fps=2）直传私有 OSS，OpenAI 多模态 content 请求，图文/视频理解流式回答，语音图文融合提问与克隆音色朗读。</div>
+          <div class="feature-files">backend/providers/oss.py · backend/app.py · frontend/src/views/ChatView.vue · frontend/src/api/index.ts</div>
+        </div>
+
+        <div class="feature-card" data-category="features audio llm">
+          <div class="feature-top">
+            <div class="feature-name">纯文本消息按需朗读</div>
+            <span class="tag tag-emerald">已上线</span>
+          </div>
+          <div class="feature-desc">AI 消息气泡提供独立按需朗读按钮（▶/■）；后端 POST /api/messages/tts 自动绑定当前用户克隆音色或默认音色合成；支持暂停续播、跨刷新 Cache Storage 持久缓存、30 条淘汰、单实例互斥与资源释放。</div>
+          <div class="feature-files">backend/app.py · frontend/src/views/ChatView.vue · frontend/src/api/index.ts</div>
+        </div>
+
+        <div class="feature-card" data-category="features llm db">
+          <div class="feature-top">
+            <div class="feature-name">聊天截图提取对话记录</div>
+            <span class="tag tag-amber">待素材验收</span>
+          </div>
+          <div class="feature-desc">代码与基础 smoke 已通过；真实聊天截图、视频素材以及多图重叠去重、乱序纠正和缺口报告仍待独立验收。</div>
+          <div class="feature-files">backend/chat_import_store.py · backend/providers/screenshot_extractor.py · frontend/src/components/ChatImportDialog.vue · frontend/src/views/ChatView.vue</div>
+        </div>
+
+        <div class="feature-card" data-category="features db ui">
+          <div class="feature-top">
+            <div class="feature-name">浏览器转写保留、套餐展示与影子用量</div>
+            <span class="tag tag-emerald">已上线</span>
+          </div>
+          <div class="feature-desc">保持浏览器端 SpeechRecognition 转写；新增公开套餐页 /pricing（免费体验、Plus 59元/月、Pro 129元/月）；PostgreSQL 记录 usage_events 并提供 GET /api/billing/summary；个人中心重构为 6 维用量进度仪表盘。</div>
+          <div class="feature-files">backend/billing_store.py · backend/migrations/004_billing_and_usage.sql · frontend/src/config/plans.ts · frontend/src/views/PricingView.vue · frontend/src/components/AccountDialog.vue</div>
+        </div>
+
+        <div class="feature-card" data-category="features db ui">
+          <div class="feature-top">
+            <div class="feature-name">链动小铺一次性套餐兑换码</div>
+            <span class="tag tag-emerald">真实闭环已验收</span>
+          </div>
+          <div class="feature-desc">安全发码、哈希存储、同档续期、跨档拦截、频控和并发幂等已完成；¥0.10真实订单已验证支付、自动发码、兑换、商家退款和对应未来权益回滚。</div>
+          <div class="feature-files">internal/auth/migrations/006_redemption_codes.sql · backend/billing_store.py · backend/app.py · scripts/create_redemption_batch.py · frontend/src/views/PurchaseView.vue</div>
+        </div>
+
+        <div class="feature-card" data-category="features ui">
+          <div class="feature-top">
+            <div class="feature-name">故事星宇与寄语信笺 UI 重构</div>
+            <span class="tag tag-amber">构建通过，待 Chrome 复测</span>
+          </div>
+          <div class="feature-desc">保留 3D 星球与寄语本地保存，增加双入口、可读深色信笺、字段标签、焦点态、键盘可达星点、暂停漫游和减少动态偏好支持。</div>
+          <div class="feature-files">frontend/src/views/StoriesView.vue</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section: Roadmap -->
+    <div class="section-container" id="roadmapSection">
+      <div class="section-header">
+        <div class="section-title">
+          🚀 规划与实施中方案 (Roadmap)
+          <span class="count">10</span>
+        </div>
+      </div>
+
+      <div class="roadmap-card">
+        <div class="roadmap-info">
+          <h4>微信与支付宝支付接入调研</h4>
+          <p>推荐桌面微信 Native + 支付宝电脑网站支付，手机端后续增加微信 H5 + 支付宝 WAP；订单、验签、幂等履约、退款、对账与自动续费边界已形成方案。</p>
+        </div>
+        <span class="tag tag-amber">2026-08-29 方案 [未完成]</span>
+      </div>
+
+      <div class="roadmap-card">
+        <div class="roadmap-info">
+          <h4>链动小铺套餐兑换码售卖</h4>
+          <p>¥0.10 Plus真实订单已完成支付、自动发码、兑换、买家售后、商家主动退款和人工权益回滚；待到账确认、未兑换退款/库存耗尽/错误码实单及API自动对账。</p>
+        </div>
+        <span class="tag tag-amber">真实闭环已验收 / 自动化待办</span>
+      </div>
+
+      <div class="roadmap-card">
+        <div class="roadmap-info">
+          <h4>套餐硬额度与原子用量治理</h4>
+          <p>A-C已完成本地回归；全局继续shadow，1个内部账号已进入hard白名单灰度并完成页面回显。待7天账单核对、边界验收及真实支付/百炼验收。</p>
+        </div>
+        <span class="tag tag-amber">内部hard灰度中</span>
+      </div>
+
+      <div class="roadmap-card">
+        <div class="roadmap-info">
+          <h4>聊天记录持久化与历史回显</h4>
+          <p>数据表迁移（006）、异步非阻塞落库、REST 接口、历史回显与新对话重置已全链路交付并通过测试。</p>
+        </div>
+        <span class="tag tag-emerald">2026-08-22 方案 [已完成]</span>
+      </div>
+
+      <div class="roadmap-card">
+        <div class="roadmap-info">
+          <h4>官方 MiniCPM-o-Demo 替换</h4>
+          <p>历史模型部署方案，代码和验证记录保留用于迁移参考；按最新决策不再作为目标生产架构。</p>
+        </div>
+        <span class="tag tag-amber">历史方案 / 已废弃</span>
+      </div>
+
+      <div class="roadmap-card">
+        <div class="roadmap-info">
+          <h4>ElevenLabs 纯 API 语音迁移</h4>
+          <p>Speech Engine + 外部 LLM API 方案未实施，现作为历史备选；当前采用浏览器转写 + 百炼 LLM/TTS。</p>
+        </div>
+        <span class="tag tag-amber">历史备选 / 未实施</span>
+      </div>
+
+      <div class="roadmap-card">
+        <div class="roadmap-info">
+          <h4>SSH 隧道自动重连与守护化</h4>
+          <p>计划将前台 SSH 脚本改造为 launchd 或 autossh 守护服务，提升本地开发鲁棒性。</p>
+        </div>
+        <span class="tag tag-cyan">待规划</span>
+      </div>
+
+      <div class="roadmap-card">
+        <div class="roadmap-info">
+          <h4>参考音频对象存储迁移</h4>
+          <p>计划将 PostgreSQL BYTEA 中的音频文件平滑迁移至 MinIO/S3 兼容对象存储。</p>
+        </div>
+        <span class="tag tag-cyan">待规划</span>
+      </div>
+
+      <div class="roadmap-card">
+        <div class="roadmap-info">
+          <h4>产品套餐与商业化计费</h4>
+          <p>首版采用免费体验、Plus 59 元和 Pro 129 元三档；已定义 AI 回复、AI 语音时长、多模态、音色槽位和单位经济，待实现真实用量、影子配额、支付退款与对账。</p>
+        </div>
+        <span class="tag tag-cyan">2026-08-27 方案 / 待实施</span>
+      </div>
+
+      <div class="roadmap-card">
+        <div class="roadmap-info">
+          <h4>浏览器转写保留与套餐前端改造</h4>
+          <p>第一阶段不接 Qwen/MiMo ASR，继续使用浏览器 SpeechRecognition；新增套餐页、个人中心多维用量、导航入口和影子用量，支付与硬额度暂不实施。</p>
+        </div>
+        <span class="tag tag-cyan">2026-08-27 方案 / 待实施</span>
+      </div>
+    </div>
+
+    <footer>
+      微光（Weiguang）AI 陪伴系统 · 进度与排障知识库 · 每次排障请严格遵守“先查后写”闭环规范
+    </footer>
+  </div>
+
+  <script>
+    // Accordion Toggle
+    function toggleIssue(el) {
+      const item = el.closest(".issue-item");
+      item.classList.toggle("open");
+    }
+
+    // Filter & Search Logic
+    const searchInput = document.getElementById("searchInput");
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const issueItems = document.querySelectorAll(".issue-item");
+    const featureCards = document.querySelectorAll(".feature-card");
+
+    let currentFilter = "all";
+
+    function applyFilterAndSearch() {
+      const query = searchInput.value.toLowerCase().trim();
+
+      // Issues filter
+      let visibleIssues = 0;
+      issueItems.forEach(item => {
+        const cat = item.getAttribute("data-category") || "";
+        const text = item.innerText.toLowerCase();
+        const matchesCategory = currentFilter === "all" || cat.includes(currentFilter);
+        const matchesSearch = query === "" || text.includes(query);
+
+        if (matchesCategory && matchesSearch) {
+          item.style.display = "block";
+          visibleIssues++;
+        } else {
+          item.style.display = "none";
+        }
+      });
+      document.getElementById("troubleshootCount").innerText = visibleIssues;
+
+      // Features filter
+      featureCards.forEach(card => {
+        const cat = card.getAttribute("data-category") || "";
+        const text = card.innerText.toLowerCase();
+        const matchesCategory = currentFilter === "all" || cat.includes(currentFilter);
+        const matchesSearch = query === "" || text.includes(query);
+
+        card.style.display = (matchesCategory && matchesSearch) ? "block" : "none";
+      });
+    }
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        tabButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.getAttribute("data-filter");
+        applyFilterAndSearch();
+      });
+    });
+
+    searchInput.addEventListener("input", applyFilterAndSearch);
+  </script>
+  <section style="max-width:1100px;margin:24px auto;padding:20px">
+    <h2>2026-09-09 · 首页故事全息卡 mock</h2>
+    <p>6 条示例故事（3 条带图、3 条无图），采用单个 Three.js 镭射画布与 HTML 分层内容；支持轮播暂停、前后切换、全文阅读和 Esc 关闭。明确标注非真实投稿，后续用户上传与管理员审核流程尚未接入。</p>
+    <p>类型检查与构建通过；Chrome 桌面及 390px 无页面横向溢出，图片正常、画布一个、无 console error。视觉验收待定，正式发布前需压缩素材；完整触屏及 WebGL 故障降级未实测。</p>
+  </section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px">
+    <h2>2026-09-09 · 首页全息卡恢复实验原版 3D 效果</h2>
+    <p>首轮平面 Shader 与 CSS 景深被实验原版卡体、镭射 Shader、灯光、相机、立体标签和人物替代，保留 6 条 mock，第一张为星辉参考卡。一个 renderer 绘制多个场景，恢复拖转、翻面、材质、层次与光泽控制。</p>
+    <p>构建通过，Chrome 拖转与背面渲染已检查；未做像素差分，用户视觉验收待定。用户投稿及管理员审核尚未接入。</p>
+  </section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-09 · 全息故事卡主题与卡面文字</h2><p>移除固定白色舞台，复用首页主题底光与文字面板颜色；作者、分类、标题和完整 mock 正文归入 3D 卡面，删除卡下重复文案。无图卡扩大正文，保留控件及双击/回车全文查看。Chrome 马尔斯绿主题已实测，视觉验收待定。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-09 · 故事背面与全卡配色</h2><p>完整故事改放背面，正面保留图片、标题与作者。卡底 Shader、镭射、金属边框、星粒和背面同步首页主题；材质选项不覆盖主题色。构建通过，Chrome 红黑/云白青蓝主题切换及背面文字已验证，无 console error。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-09 · 11 套卡片独立搭配色</h2><p>页面主题映射人工选配的对比色卡：黑底配暮紫香槟、青蓝配赤陶亚麻、酒红配月青珍珠等。卡底/流光/金属/纸面/墨色独立，正文保留背面。构建及 11 组文字对比度计算通过，原色和青蓝已做浏览器视觉检查。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-09 · 轮播顺滑与圆角文字牌</h2><p>轮播保留亚像素位移，通过相机补偿 WebGL 视口取整；卡片布局改在尺寸变化时读取。正面文字框增加圆角。DPR 1/1.5/2 位移数学检查通过，Chrome 播放正常、圆角可见、无渲染错误；实际帧率未量测。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-09 · 透明卡面与轮播流光</h2><p>移除实色卡底、背面纸面和卡外底光；保留主题金属边与透明流光，背面故事以透明文字贴图直印。轮播位置驱动高光移动。构建通过，Chrome 背面及透明效果已检查，无渲染错误。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-09 · 可见扫光与珍珠银</h2><p>独立亮带随轮播时间约 3.8 秒循环，位于图片上方；恢复珍珠银虹彩与银边，保留主题配色和烫金选项。构建及材质状态检查通过，Chrome 连续画面已确认无图卡与照片上的扫光，无渲染错误。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-09 · 材质自身反光</h2><p>按用户澄清删除独立白光网格与计时，轮播位置改变原有材质观察方向，使反光自然随位置变化；珍珠银虹彩保留。状态检查通过，Chrome 播放无渲染错误。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-10 · 故事卡旋转圆环</h2><p>六张卡排成真实 3D 圆周，支持拖动、箭头与圆点选择、自动旋转和翻面。单场景共享相机驱动反光，主题与背面故事保留。布局/材质检查和构建通过，Chrome 拖转及 390px 边界已检查，最终视觉验收待定。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-11 · 阿里云 ECS 公网 IP 部署</h2><p>未安装宝塔；Docker Compose运行 FastAPI/PostgreSQL，已有Nginx代理回环8080。Docker仓库网络问题通过阿里云内网源及本地amd64预构建镜像解决，加密OSS临时对象已删除。公网IP首页、健康和套餐接口200，Chrome首页/登录弹窗/3D圆环/图片正常且无console error。当前为HTTP staging，实际账号和付费未写数据验收；正式运营前仍需备案与HTTPS。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-11 · 线上兑换库存与 SPA 路由修复</h2><p>ECS 新库漏迁链动小铺在售库存，导致首张新购 Plus 卡密被判无效。已事务迁入两个有效批次的 27 张未兑换哈希，不包含原始码和历史用户数据；首张线上兑换回读为 Plus/active。Nginx 同时补充页面路由回退，Safari 直接刷新套餐页通过，API 状态码保持真实。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-11 · 运营管理后台公网部署</h2><p>独立管理端按 /admin/ 子路径构建并由 Nginx 静态托管，管理端深层路由独立回退。线上唯一注册账号已绑定为唯一管理员，白名单与数据库匹配数量均为1。登录页、脚本资源和健康接口验收通过；当前仍为HTTP，正式运营前必须启用HTTPS。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-11 · 管理端成本显示修正</h2><p>线上仅有一次纯文字问答，没有TTS用量流水，因此0字/0秒为真实数据。成本页已增加零数据说明，并修正表头选择器优先级，使套餐平均单次文本成本等表格的列名与数值统一对齐。类型检查、生产构建和线上静态资源验证通过。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-11 · 手机克隆声音入口与管理端刷新修复</h2><p>480px以下恢复紧凑的“克隆声音”按钮，400px Chrome已验证可见并可打开克隆弹窗。管理端删除App.vue重复Session初始化，只保留路由守卫；本地5174管理端已启动，有效Session刷新成本页后保持原路径，修复也已发布线上/admin/。目标测试、类型检查和两端构建通过；一条既有聊天导入mock测试仍失败，与本次修改无关。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-11 · 生产发布包单入口脚本</h2><p>新增单命令发布入口，完成两端检查与构建、amd64 API镜像、管理端静态资源、单个发布包和SHA-256生成；包内不含运行密钥。首次自动生产发布20260911T151342Z已通过，数据库先行备份，API与PostgreSQL healthy；首页、聊天、管理端、刷新登录、400px克隆入口和OSS预检均已验收。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-11 · 线上OSS直传CORS修复</h2><p>克隆声音签名PUT失败是Bucket仅允许本地5173来源。现已在原规则追加精确公网来源http://47.114.50.170，保留GET/PUT/HEAD、Headers *、ETag与请求ID暴露，未开放任意来源。真实OPTIONS和签名PUT均返回200，临时对象已删除。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-12 · 字体加载与克隆音频降噪选型</h2><p>删除Google Fonts远程请求，改用系统中文无衬线与宋体栈；目标测试、类型检查和构建通过，浏览器DOM不再引用Google字体，尚未发布。降噪首选DeepFilterNet异步文件清洗，RNNoise用于未来实时链路，noisereduce作为基线，ClearerVoice-Studio仅放独立重型Worker；原音与净化音必须试听确认。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-12 · DeepFilterNet上传音频降噪接入</h2><p>接入官方0.5.6 amd64静态二进制和许可证校验，浏览器原生转48kHz单声道WAV，后端账号隔离、限频并异步净化，弹窗支持原音/净化音A-B选择。模块、额度、OSS、前端和真实镜像检查通过；15秒模拟处理约25秒、峰值66MiB。尚未发布，真实用户音频与百炼克隆待验收。</p></section>
+  <section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-12 · 裁剪与净化试听时长一致性修复</h2><p>6.9秒选区与9.4秒净化试听并存，是确认裁剪前仍显示旧原音净化结果导致。裁剪期间现已隐藏旧净化结果，净化按钮保持可见但提示先确认并禁用，同时禁止创建音色；确认后清空旧对象，按新裁剪WAV重新净化。目标测试10/10、类型检查和生产构建通过，尚未发布。</p></section>
+<!-- 2026-09-12 语音自然表达 -->
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>语音聊天去人设与自然表达</h2><p>语音入口移除角色提示词，自动语速固定1.0，关闭自动情绪和拟声标签，以完整语意段合成。手动设置保留。无外部调用回归、后端编译与本地健康检查通过，主观听感待试听，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-12 · 自然情感表达优化</h2><p>自动判断闲聊、安慰、喜悦、玩笑、说明或严肃场景，整轮保持同一语气与0.96–1.04范围的语速；手动设置优先。移除自动模式中旧播报描述的影响，短回答合段，减少套话。场景映射、连续段稳定、手动覆盖与回放等mock回归通过，实际听感待试听，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-12 · 音色设置面板同步</h2><p>自动模式下禁用固定语速、基调、场景与补充描述并解释原因；保留旧值供手动编辑。拟声auto按关闭展示，移除自动少量文案，说明整轮调整及仅新语音生效。前端类型检查与构建通过，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-13 · CosyVoice接入</h2><p>新复刻默认CosyVoice-v3.5-plus，旧Qwen按原模型工作。增加音色就绪检查、模型标签适配及分模型成本；HTTP/SSE、语音路由、额度mock与两端构建通过。真实CosyVoice音色试听待验收，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-13 · CosyVoice无声音修复</h2><p>声音指令过长导致供应商428，聊天仅返回文字。精简场景指令并在HTTP/SSE共享入口限制100字符单位，中文保守按2计；回归通过，真实音色短指令返回PCM，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-13 · 关闭CosyVoice声音指令</h2><p>HTTP/SSE统一省略instruction，保留语速与采样率，设置页说明声音描述暂不生效。官方音量、语速、音调、语言与方言参数已归档；回归与本地健康通过，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-13 · CosyVoice默认参数试听</h2><p>仅发送文本、音色及音频格式，忽略前端声音调节。PCM按默认22050Hz播放计时。请求字段及语音回归通过，本地健康正常，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-13 · CosyVoice语速与音量设置</h2><p>专用设置页显示rate和volume，保存至已有声音配置并用于新合成。指令保持关闭，Qwen保留原设置。音量0边界、语音及额度回归与构建通过，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-13 · 声音描述、pitch与恢复默认</h2><p>恢复情绪、年龄感和声音特点，短指令限制100单位；新增pitch。恢复默认并保存后只发送文本、音色和格式，编辑任一项退出。回归、构建及两种模式真实PCM验证通过，本地生效，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-13 · 文本流容错与情绪提示</h2><p>固定情绪切换提示已补充；解析器支持多行JSON及流式碎片，删除空回复“我在听。”占位。回归/构建通过。历史失败未记录异常，确切原因未确认，已补充脱敏诊断日志。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-13 · 声音描述动态额度</h2><p>取消固定30字限制，实时显示完整指令、已用及剩余100单位；超限禁止保存并保留输入。自动情绪为示例预览，重置时不发送指令。2项回归与前端构建通过，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 无提示词聊天试用</h2><p>聊天入口停用system/developer消息，语音改为普通文本分句；保留历史和声音配置。回归与健康检查通过，本地生效，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 恢复聊天规则</h2><p>恢复日常聊天提示词，取消NDJSON和场景输出要求。普通文本分句合成，回归与健康通过，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 恢复语音NDJSON</h2><p>恢复语音scene/text规划和解析，普通聊天保持正文。多行兼容、回归及本地健康通过，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 聊天头像与会话标题编辑</h2><p>AI头像点击更换，列表独立重命名；后端归属校验并更新现有字段。mock与构建通过，Chrome本地入口可见，真实保存刷新待验收，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 会话原位编辑</h2><p>重命名取消弹窗，列表直接展开标题输入与头像入口；消息头像恢复普通图片。Chrome交互及构建通过，正文padding未增加，未发布。</p></section>
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 消息与附件按钮对齐</h2><p>统一消息区与输入区实际内容宽度，Chrome实测两处左边缘相等。本地生效，未发布。</p></section>
+</body>
+</html>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 首页首屏背景</h2><p>接入指定2.png作为首屏背景，等比铺满并叠加暗色渐变。生产构建与本地浏览器显示检查通过，未发布线上。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 首页背景切换为1.png</h2><p>按用户要求试用横版双人图片，保留暗色渐变。构建与本地浏览器检查通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 首页图片仅右侧显示</h2><p>恢复2.png，仅占首屏右侧45%宽度，边缘渐变融合。构建和本地浏览器检查通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 右侧背景硬边与层级修复</h2><p>原首屏图片覆盖底光造成竖直分界。改为页面独立底层图片和透明遮罩渐隐，保留右侧45%布局。构建、截图和计算层级验证通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 首页左右人像</h2><p>加入左侧男生照片，与右侧女生使用相同尺寸、底层层级及反向渐隐。构建和本地浏览器显示检查通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 首页照片分段展示</h2><p>移除光板展示及控制区，首屏1.png；下方先女生靠右，再男生靠左。生产构建和Chrome逐段截图验证通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 取消椭圆照片遮罩</h2><p>将径向椭圆遮罩改为四边8%线性渐隐，男女照片保留矩形构图。构建与Chrome截图检查通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 恢复单侧背景渐隐</h2><p>女生向左、男生向右透明渐隐，底部淡出，外侧贴边；图片位于底光与粒子下方，不透明度0.65。构建和Chrome检查通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 首屏3.png</h2><p>首屏换成3.png，下方女生及男生照片区移除，素材保留。构建与Chrome检查通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 首屏4.png</h2><p>首屏试用4.png，保留原有渐变与布局。构建和Chrome检查通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 首屏恢复3.png</h2><p>按用户选择恢复3.png，渐变与布局不变。生产构建通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 聊天背景上传</h2><p>新增账号级背景上传和恢复默认，存入数据库并复用私有OSS。构建、mock、迁移和按钮检查通过；真实选图上传与刷新保留待验收，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 背景范围分开设置</h2><p>全局覆盖当前聊天整页，单独覆盖右侧消息区。全局保存成功同步清空单独背景，失败保留。mock、构建、迁移及Chrome入口检查通过；新范围真实上传覆盖待验收，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 上传背景完整适配</h2><p>修复cover放大裁切，改为contain等比完整显示，单独消息背景以深色填充留白。真实上传背景桌面和390像素手机检查通过，无横向溢出，构建通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 移除全局背景</h2><p>聊天页仅保留消息区背景上传和清除。构建及Chrome计算样式验证通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 取消聊天背景上传</h2><p>移除全部背景上传入口和自定义背景显示，恢复默认深色。构建和Chrome检查通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-14 · 声音弹窗文案清理</h2><p>去除厂商、模型、内部音色ID与上传实现说明，保留音色名称、时长和录音指导。构建及Chrome弹窗检查通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-15 · 手机首页适配</h2><p>横图保持原比例展示在导航下方，文案位于下方，修复人脸过度裁切和中文单字换行。375×667截图及构建通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-15 · 手机首屏图片叠字</h2><p>按用户澄清恢复手机整屏背景和文字叠加，调整取景与字号间距。375×667截图及构建通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-15 · 手机完整背景叠字</h2><p>手机图片contain居中，不裁切，仍放在文字后方；空余区域为深色。440×956截图与构建通过，未发布。</p></section>
+
+<section style="max-width:1100px;margin:24px auto;padding:20px"><h2>2026-09-15 · 手机背景恢复铺满</h2><p>按用户要求恢复上一版cover铺满与38%取景，保留文字叠加。构建通过，未发布。</p></section>
